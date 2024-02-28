@@ -1,3 +1,4 @@
+import os
 import numpy
 import astropy.constants
 import astropy.io.ascii
@@ -9,6 +10,7 @@ class Mag:
         self.weight = None
         self.lambda_eff = None
         self.mag = None
+        self.filter_dir = os.path.join('data', 'filters')
         if self.fn is not None:
             self.read_filter(fn)
             self.lambda_eff = self.compute_lambda_eff()
@@ -22,6 +24,7 @@ class Mag:
         weight (the weight of the filter at that wavelength)
         '''
         self.fn = fn
+        fn = os.path.join(self.filter_dir, fn)
         data = astropy.io.ascii.read(fn)
         self.wave = data['col1']
         self.weight = data['col2']

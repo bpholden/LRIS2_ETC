@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import astropy.io.fits
 
@@ -5,8 +6,9 @@ class Sky:
 
     def __init__(self):
 
-        self.bfn = 'bsky.eps_pang_parcsec.fits'
-        self.rfn = 'rsky.eps_pang_parcsec_onemicron.fits'
+        self.sky_dir = 'data/sky'
+        self.bfn = os.path.join(self.sky_dir,'bsky.eps_pang_parcsec.fits')
+        self.rfn = os.path.join(self.sky_dir,'rsky.eps_pang_parcsec_onemicron.fits')
 
         self.bpix, self.bwave, self.bspec = self.read_spec(self.bfn)
         self.rpix, self.rwave, self.rspec = self.read_spec(self.rfn)

@@ -69,7 +69,7 @@ def main():
     lrisred.sheight = args.slit_length
     lrisblue.sheight = args.slit_length
 
-    filen = 'starb1_template.fits'
+    filen = 'data/templates/starb1_template.fits'
     waves, flux = read_template(filen, redshift=args.redshift)
 
     rmag = Mag.Mag('sdss_rprime.dat')

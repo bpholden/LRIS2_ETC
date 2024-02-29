@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import astropy.io.fits as fits
 import numpy as np
@@ -16,15 +17,17 @@ BLUE_CUTOFF = 3100
 RED_CUTOFF = 9500
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Plot a sky spectrum')
+    parser = argparse.ArgumentParser(description='Plot a galaxy spectrum')
     parser.add_argument('--redshift', '-z', type=float, default=0, help='Redshift')
     parser.add_argument('--time', '-t', type=float, default=1200, help='exposure time (s)')
     parser.add_argument('--airmass', '-a', type=float, default=1.2, help='airmass')
     parser.add_argument('--seeing', '-s', type=float, default=1.0, help='seeing (arcsec)')
     parser.add_argument('--slit_width', '-w', type=float, default=0.7, help='slit width (arcsec)')
     parser.add_argument('--slit_length', '-l', type=float, default=8, help='slit length (arcsec)')
-    parser.add_argument('--mag', '-m', type=float, default=22, help='r magnitude')
+    parser.add_argument('--mag', '-m', type=float, default=22, help='filter magnitude')
+    parser.add_argument('--filter', '-f', type=str, default='sdss_rprime.dat', help='filter')
     parser.add_argument('--flux_plots', action='store_true', help='make flux plots')
+    parser.add_argument('--template', '-T', type=str, default='starb1_template.fits', help='template file')
     return parser.parse_args()
 
 
@@ -69,16 +72,18 @@ def main():
     lrisred.sheight = args.slit_length
     lrisblue.sheight = args.slit_length
 
-    filen = 'data/templates/starb1_template.fits'
+    filen = 'data/templates'
+    filen = os.path.join(filen, args.template)
     waves, flux = read_template(filen, redshift=args.redshift)
 
-    rmag = Mag.Mag('sdss_rprime.dat')
-    abs_mag = rmag.compute_ABmag(waves, flux)
+    mmag = Mag.Mag(args.filter)
+    abs_mag = mmag.compute_ABmag(waves, flux)
     print('abs mag = ', abs_mag)
     scale = 10**(0.4*(abs_mag - args.mag))
     flux *= scale
 
     sky = Sky.Sky()
+
     flux *= args.time
     sky.bspec *= args.time
     sky.rspec *= args.time
@@ -126,12 +131,13 @@ def main():
     snr[blue_waves] = flux[blue_waves]/np.sqrt(flux[blue_waves] + sky_bflux)
     snr[red_waves] = flux[red_waves]/np.sqrt(flux[red_waves] + sky_rflux)
 
-    plt.plot(waves[in_band], flux[in_band], 'k-')
-    plt.plot(waves[blue_waves], sky_bflux, 'b-')
-    plt.plot(waves[red_waves], sky_rflux, 'r-')
-    plt.xlabel(r'Wavelength ($\AA$)')
-    plt.ylabel(r'($\gamma\ pix^{-1}$)')
-    plt.show()
+    if args.flux_plots:
+        plt.plot(waves[in_band], flux[in_band], 'k-')
+        plt.plot(waves[blue_waves], sky_bflux, 'b-')
+        plt.plot(waves[red_waves], sky_rflux, 'r-')
+        plt.xlabel(r'Wavelength ($\AA$)')
+        plt.ylabel(r'($\gamma\ pix^{-1}$)')
+        plt.show()
 
 
     plt.plot(waves[in_band], snr[in_band], 'k-')

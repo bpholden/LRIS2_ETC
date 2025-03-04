@@ -39,6 +39,7 @@ class Instrument:
         '''
         grating_filename = os.path.join('data', 'throughput', self.grating + "_eff.csv")
         self.throughput = astropy.io.ascii.read(grating_filename)
+        self.throughput['wavelength'] *= 10 # we work in Angstroms but these tables are in nm
 
     def lris2_red(self, grating="R400"):
         '''

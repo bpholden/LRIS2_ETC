@@ -1,6 +1,11 @@
-# Description: Instrument class for the snr calculator
-class Instrument:
+"""Instrument class for the snr calculator"""
+import os
+import astropy.io.ascii
 
+class Instrument:
+    """
+    Instrument()
+    """
     def __init__(self):
         self.name = ""
         self.sheight = 0.0 # Slit height
@@ -20,16 +25,33 @@ class Instrument:
         self.grating= ''
         self.cwave= 0. # Central wavelength
         self.wvmnx= [] #
-        self.dely= 0.0 
+        self.dely= 0.0
         self.throughput = None
         self.BLUE_CUTOFF = 0
         self.RED_CUTOFF = 1e6
 
     def __repr__(self):
-        return '<Instrument "%s">' % (self.name)
+        return f'<Instrument {self.name} {self.grating}>'
 
-    def lris2_red(self):
+    def read_throughput(self):
+        '''
+        read_throughput(self)
+        '''
+        grating_filename = os.path.join('data', 'throughput', self.grating + ".csv")
+        self.throughput = astropy.io.ascii.read(grating_filename)
 
+    def lris2_red(self, grating="R400"):
+        '''
+        lris2_red(self, grating="R400")
+
+        Builds the red side of LRIS-2, assumse R400 grating 
+        unless otherwise specified.
+        '''
+        self.name = "LRIS-2 Red"
+        if grating not in ("R400", "R700", "R750"):
+            raise ValueError(f"Grating {grating} not supported for {self.name}")
+
+        self.grating = grating
         self.sheight = 8
         self.swidth = 0.7
         self.dark = 0.0
@@ -46,8 +68,19 @@ class Instrument:
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
 
-    def lris2_blue(self):
+    def lris2_blue(self, grating="B600"):
+        '''
+        lris2_blue(self, grating="B600")
 
+        Builds the blue side of LRIS-2, assumse B600 grating 
+        unless otherwise specified.
+        '''
+        self.name = "LRIS-2 Blue"
+
+        if grating not in ("B600", "B1200", "B1300"):
+            raise ValueError(f"Grating {grating} not supported for {self.name}")
+
+        self.grating = grating
         self.sheight = 8
         self.swidth = 0.7
         self.dark = 0.0
@@ -63,6 +96,8 @@ class Instrument:
         self.BLUE_CUTOFF = 3100
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
+
+
 
 
 def deimos(tel,slit=1.0,grating="600"):

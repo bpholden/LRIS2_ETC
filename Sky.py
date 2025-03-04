@@ -13,6 +13,9 @@ class Sky:
         self.bpix, self.bwave, self.bspec = self.read_spec(self.bfn)
         self.rpix, self.rwave, self.rspec = self.read_spec(self.rfn)
 
+        self.wave = np.concatenate((self.bwave, self.rwave))
+        self.spec = np.concatenate((self.bspec, self.rspe))
+
     def read_spec(self, fn):
 
         spec_hdu = astropy.io.fits.open(fn)

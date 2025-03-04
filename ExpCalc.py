@@ -21,7 +21,7 @@ class ExpCalc():
         self.abs_mag = None
         self.transmission = Transmission.Transmission()
         self.flux = None
-        self.wave = None
+        self.waves = None
         self.airmass = airmass
         self.seeing = seeing
         self.filter = mfilter
@@ -68,9 +68,9 @@ class ExpCalc():
         hdus = fits.open(filen)
         dat = hdus[1].data
 
-        self.wave = dat['WAVELENGTH']
+        self.waves = dat['WAVELENGTH']
         self.flux = dat['FLUX']
-        self.wave *= (1 + self.redshift)
+        self.waves *= (1 + self.redshift)
         return
 
     def compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None):

@@ -103,6 +103,7 @@ class ExpCalc():
 
             plt.xlabel(r'Wavelength ($\AA$)')
             plt.ylabel(r'Intensity ($ergs\ \AA^{-1}\ cm^{-2}$)')
+            plt.title(f'Flux {self.instrument.name}')
             plt.show()
 
         self.flux *= self.instrument.Ang_per_pix
@@ -111,6 +112,7 @@ class ExpCalc():
             plt.plot(self.waves, self.flux, 'k-')
             plt.xlabel(r'Wavelength ($\AA$)')
             plt.ylabel(r'($\gamma\ pix^{-1}$)')
+            plt.title(f'Photons {self.instrument.name}')
             plt.show()
         self.compute_extinction()
         self.compute_throughput()
@@ -118,6 +120,7 @@ class ExpCalc():
             plt.plot(self.waves, self.flux, 'k-')
             plt.xlabel(r'Wavelength ($\AA$)')
             plt.ylabel(r'($\gamma\ pix^{-1}$)')
+            plt.title(f'Photons after throughput and extinction {self.instrument.name}')
             plt.show()
 
         npix = int(self.seeing / self.instrument.scale_perp)

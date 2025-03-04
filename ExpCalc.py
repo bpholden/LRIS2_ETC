@@ -101,7 +101,7 @@ class ExpCalc():
         self.compute_extinction()
         self.compute_throughput()
 
-        self.flux[self.waves] *= self.instrument.Ang_per_pix
+        self.flux *= self.instrument.Ang_per_pix
 
         npix = int(self.seeing / self.instrument.scale_perp)
 
@@ -116,4 +116,4 @@ class ExpCalc():
         snr = np.zeros_like(self.waves)
         snr[in_band] = self.flux[in_band]/np.sqrt(self.flux[in_band] + sky_flux)
 
-        return snr[in_band]
+        return snr[in_band], in_band

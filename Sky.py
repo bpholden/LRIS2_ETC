@@ -14,7 +14,7 @@ class Sky:
         self.rpix, self.rwave, self.rspec = self.read_spec(self.rfn)
 
         self.wave = np.concatenate((self.bwave, self.rwave))
-        self.spec = np.concatenate((self.bspec, self.rspe))
+        self.spec = np.concatenate((self.bspec, self.rspec))
 
     def read_spec(self, fn):
 

@@ -88,7 +88,7 @@ class ExpCalc():
         self.mag = Mag.Mag(self.filter)
         self.read_template()
         self.abs_mag = self.mag.compute_ABmag(self.waves, self.flux)
-        self.flux *= 10**(0.4*(self.abs_mag - self.mag))
+        self.flux *= 10**(0.4*(self.abs_mag - self.app_mag))
 
         self.flux *= time
         self.sky.spec *= time

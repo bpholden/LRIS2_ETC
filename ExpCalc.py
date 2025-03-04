@@ -49,6 +49,9 @@ class ExpCalc():
         extinct_interp = np.interp(self.wave, trans.wave, trans.extinct)
         self.flux *= extinct_interp
         return
+    
+    def compute_throughput(self):
+        
 
     def read_template(self):
         """
@@ -88,6 +91,7 @@ class ExpCalc():
 
         self.photons()
         self.compute_extinction()
+        self.compute_throughput()
 
         self.flux[self.waves] *= self.instrument.Ang_per_pix
 

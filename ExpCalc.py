@@ -49,9 +49,15 @@ class ExpCalc():
         extinct_interp = np.interp(self.wave, trans.wave, trans.extinct)
         self.flux *= extinct_interp
         return
-    
+
     def compute_throughput(self):
-        
+        """
+        compute_throughput(self)
+        """
+        self.instrument.read_throughput()
+        throughput_interp = np.interp(self.wave, self.instrument.throughput['wavelength'], self.instrument.throughput['throughput'])
+        self.flux *= throughput_interp
+        return
 
     def read_template(self):
         """

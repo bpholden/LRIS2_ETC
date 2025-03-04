@@ -37,7 +37,7 @@ class Instrument:
         '''
         read_throughput(self)
         '''
-        grating_filename = os.path.join('data', 'throughput', self.grating + ".csv")
+        grating_filename = os.path.join('data', 'throughput', self.grating + "_eff.csv")
         self.throughput = astropy.io.ascii.read(grating_filename)
 
     def lris2_red(self, grating="R400"):

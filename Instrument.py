@@ -22,7 +22,8 @@ class Instrument:
         self.wvmnx= [] #
         self.dely= 0.0 
         self.throughput = None
-
+        self.BLUE_CUTOFF = 0
+        self.RED_CUTOFF = 1e6
 
     def __repr__(self):
         return '<Instrument "%s">' % (self.name)
@@ -40,6 +41,8 @@ class Instrument:
         self.mag_para = 7.4
         self.mag_perp = 7.4
         self.Ang_per_pix = 1.13 #
+        self.BLUE_CUTOFF = 5500
+        self.RED_CUTOFF = 9500
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
 
@@ -56,6 +59,8 @@ class Instrument:
         self.mag_para = 7.4
         self.mag_perp = 7.4
         self.Ang_per_pix = 0.62 #
+        self.RED_CUTOFF = 5700
+        self.BLUE_CUTOFF = 3100
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
 
@@ -88,11 +93,9 @@ def deimos(tel,slit=1.0,grating="600"):
     dei.wvmnx = [4000., 10000.]
 
     ## Slit
-    dei.swidth = slit 
+    dei.swidth = slit
     dei.sheight = 10.0  # arcsec
 
     # dei.throughput = 
 
     return dei
-
-

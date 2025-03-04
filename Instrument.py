@@ -29,6 +29,7 @@ class Instrument:
         self.throughput = None
         self.BLUE_CUTOFF = 0
         self.RED_CUTOFF = 1e6
+        self.throughput_dir = 'data/throughput'
 
     def __repr__(self):
         return f'<Instrument {self.name} {self.grating}>'
@@ -37,7 +38,7 @@ class Instrument:
         '''
         read_throughput(self)
         '''
-        grating_filename = os.path.join('data', 'throughput', self.grating + "_eff.csv")
+        grating_filename = os.path.join(self.throughput_dir, self.grating + "_eff.csv")
         self.throughput = astropy.io.ascii.read(grating_filename)
         self.throughput['wavelength'] *= 10 # we work in Angstroms but these tables are in nm
 

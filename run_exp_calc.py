@@ -8,7 +8,9 @@ import Instrument
 import Telescope
 
 def parse_args():
-
+    '''
+    parse_args()
+    '''
     parser = argparse.ArgumentParser(description='Plot a galaxy spectrum')
     parser.add_argument('--redshift', '-z', type=float, default=0, help='Redshift (0.0)')
     parser.add_argument('--time', '-t', type=float, default=1200, help='exposure time (1200 s)')
@@ -25,10 +27,13 @@ def parse_args():
     parser.add_argument('--blue_grism', type=str, default='B600', help='Blue Grism (B600)')
     parser.add_argument('--template', '-T', type=str, default='starb1_template.fits', \
                         help='Template file')
+    parser.add_argument('--flux_plots', action='store_true', help='make flux plots')
     return parser.parse_args()
 
 def main(args):
-
+    '''
+    Run the exposure time calculator.
+    '''
     keck_1 = Telescope.Telescope()
     keck_1.keckone()
     lris2_blue = Instrument.Instrument()
@@ -40,6 +45,10 @@ def main(args):
                                     args.redshift, args.template, lris2_blue, keck_1)
     red_exp_calc = ExpCalc.ExpCalc(args.mag, args.filter, args.seeing, args.airmass, \
                                    args.redshift, args.template, lris2_red, keck_1)
+
+    if args.flux_plots:
+        blue_exp_calc.flux_plots = True
+        red_exp_calc.flux_plots = True
 
     blue_snr, blue_good = blue_exp_calc.compute_spectrum(args.time, args.slit_length,\
                                                           args.slit_width)

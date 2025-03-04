@@ -2,6 +2,7 @@ import os
 import numpy as np
 import astropy.constants
 import astropy.io.fits as fits
+import matplotlib.pyplot as plt
 
 import Sky
 import Mag
@@ -27,7 +28,7 @@ class ExpCalc():
         self.filter = mfilter
         self.redshift = redshift
         self.template_filename = template_filename
-
+        self.flux_plots = False
 
 
     def photons(self):
@@ -97,11 +98,27 @@ class ExpCalc():
                                                      self.sky.wave, self.sky.spec)
         self.flux = self.flux * self.telescope.area
 
-        self.photons()
-        self.compute_extinction()
-        self.compute_throughput()
+        if self.flux_plots:
+            plt.plot(self.waves, self.flux, 'k-')
+
+            plt.xlabel(r'Wavelength ($\AA$)')
+            plt.ylabel(r'Intensity ($ergs\ \AA^{-1}\ cm^{-2}$)')
+            plt.show()
 
         self.flux *= self.instrument.Ang_per_pix
+        self.photons()
+        if self.flux_plots:
+            plt.plot(self.waves, self.flux, 'k-')
+            plt.xlabel(r'Wavelength ($\AA$)')
+            plt.ylabel(r'($\gamma\ pix^{-1}$)')
+            plt.show()
+        self.compute_extinction()
+        self.compute_throughput()
+        if self.flux_plots:
+            plt.plot(self.waves, self.flux, 'k-')
+            plt.xlabel(r'Wavelength ($\AA$)')
+            plt.ylabel(r'($\gamma\ pix^{-1}$)')
+            plt.show()
 
         npix = int(self.seeing / self.instrument.scale_perp)
 

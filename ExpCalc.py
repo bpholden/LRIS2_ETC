@@ -35,7 +35,7 @@ class ExpCalc():
         photons(self)
         """
         c = astropy.constants.c.value * 1e10 # convert to Angstroms
-        self.flux *= self.wave /(6.626e-27 * c)  # h is in ergs s, c is in Angstroms s^-1
+        self.flux *= self.waves /(6.626e-27 * c)  # h is in ergs s, c is in Angstroms s^-1
 
         return
 
@@ -45,7 +45,7 @@ class ExpCalc():
         """
 
         trans = Transmission.Transmission(airmass=self.airmass)
-        extinct_interp = np.interp(self.wave, trans.wave, trans.extinct)
+        extinct_interp = np.interp(self.waves, trans.wave, trans.extinct)
         self.flux *= extinct_interp
         return
 
@@ -54,7 +54,7 @@ class ExpCalc():
         compute_throughput(self)
         """
         self.instrument.read_throughput()
-        throughput_interp = np.interp(self.wave, self.instrument.throughput['wavelength'],\
+        throughput_interp = np.interp(self.waves, self.instrument.throughput['wavelength'],\
                                        self.instrument.throughput['throughput'])
         self.flux *= throughput_interp
         return

@@ -128,8 +128,11 @@ def main():
     sky_rflux *= red_npix
 
     snr = np.zeros_like(waves)
-    snr[blue_waves] = flux[blue_waves]/np.sqrt(flux[blue_waves] + sky_bflux)
-    snr[red_waves] = flux[red_waves]/np.sqrt(flux[red_waves] + sky_rflux)
+    blue_noise = np.sqrt(flux[blue_waves] + sky_bflux + blue_npix*lrisblue.readnoise**2)
+    snr[blue_waves] = flux[blue_waves]/blue_noise
+
+    red_noise = np.sqrt(flux[red_waves] + sky_rflux + red_npix*lrisred.readnoise**2)
+    snr[red_waves] = flux[red_waves]/red_noise
 
     if args.flux_plots:
         plt.plot(waves[in_band], flux[in_band], 'k-')
@@ -141,6 +144,8 @@ def main():
 
 
     plt.plot(waves[in_band], snr[in_band], 'k-')
+    plt.plot(waves[blue_waves], snr[blue_waves], 'b-')
+    plt.plot(waves[red_waves], snr[red_waves], 'r-')
     plt.xlabel(r'Wavelength ($\AA$)')
     plt.ylabel(r'SNR')
     plt.show()

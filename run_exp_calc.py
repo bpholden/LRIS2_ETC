@@ -41,11 +41,13 @@ def main(args):
     red_exp_calc = ExpCalc.ExpCalc(args.mag, args.filter, args.seeing, args.airmass, \
                                    args.redshift, args.template, lris2_red, keck_1)
 
-    blue_snr = blue_exp_calc.compute_spectrum(args.time, args.slit_length, args.slit_width)
-    red_snr = red_exp_calc.compute_spectrum(args.time, args.slit_length, args.slit_width)
+    blue_snr, blue_good = blue_exp_calc.compute_spectrum(args.time, args.slit_length,\
+                                                          args.slit_width)
+    red_snr, red_good = red_exp_calc.compute_spectrum(args.time, args.slit_length, \
+                                                      args.slit_width)
 
-    plt.plot(blue_exp_calc.wave, blue_snr, label='Blue')
-    plt.plot(red_exp_calc.wave, red_snr, label='Red')
+    plt.plot(blue_exp_calc.waves[blue_good], blue_snr, 'b-', label='Blue')
+    plt.plot(red_exp_calc.waves[red_good], red_snr, 'r-', label='Red')
     plt.xlabel('Wavelength (Angstroms)')
     plt.ylabel('SNR')
     plt.legend()

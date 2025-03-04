@@ -68,9 +68,9 @@ class ExpCalc():
         hdus = fits.open(filen)
         dat = hdus[1].data
 
-        self.waves = dat['WAVELENGTH']
+        self.wave = dat['WAVELENGTH']
         self.flux = dat['FLUX']
-        self.waves *= (1 + self.redshift)
+        self.wave *= (1 + self.redshift)
         return
 
     def compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None):

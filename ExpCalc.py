@@ -1,9 +1,8 @@
+import os
 import numpy as np
 import astropy.constants
 import astropy.io.fits as fits
 
-import Telescope
-import Instrument
 import Sky
 import Mag
 import Transmission
@@ -55,7 +54,8 @@ class ExpCalc():
         compute_throughput(self)
         """
         self.instrument.read_throughput()
-        throughput_interp = np.interp(self.wave, self.instrument.throughput['wavelength'], self.instrument.throughput['throughput'])
+        throughput_interp = np.interp(self.wave, self.instrument.throughput['wavelength'],\
+                                       self.instrument.throughput['throughput'])
         self.flux *= throughput_interp
         return
 
@@ -63,7 +63,9 @@ class ExpCalc():
         """
         read_template(self)
         """
-        hdus = fits.open(self.template_filename)
+        filen = 'data/templates'
+        filen = os.path.join(filen, self.template_filename)
+        hdus = fits.open(filen)
         dat = hdus[1].data
 
         self.waves = dat['WAVELENGTH']

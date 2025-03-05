@@ -34,13 +34,42 @@ class Instrument:
     def __repr__(self):
         return f'<Instrument {self.name} {self.grating}>'
 
-    def read_throughput(self):
+    def __str__(self):
+        return f'>Instrument {self.name} {self.grating}>'
+
+    def read_xidl_throughput(self):
         '''
-        read_throughput(self)
+        read_lris_throughput(self)
+        '''
+        short_name = f"sens_{self.name}_{self.grating}.fits.gz"
+        grating_filename = os.path.join(self.throughput_dir, short_name)
+        hdus = astropy.io.fits.open(grating_filename)
+        self.throughput = {}
+        self.throughput['wavelength'] = hdus[2].data['WAV']
+        self.throughput['efficiency'] = hdus[2].data['EFF']
+
+    def read_lris2_throughput(self):
+        '''
+        read_lris2_throughput(self)
         '''
         grating_filename = os.path.join(self.throughput_dir, self.grating + "_eff.csv")
         self.throughput = astropy.io.ascii.read(grating_filename)
         self.throughput['wavelength'] *= 10 # we work in Angstroms but these tables are in nm
+
+    def read_throughput(self):
+        '''
+        read_throughput(self)
+        '''
+
+        if "LRIS-2" in self.name:
+            self.read_lris2_throughput()
+        elif "LRIS" in self.name:
+            self.read_xidl_throughput()
+        elif 'DEIMOS' in self.name:
+            self.read_xidl_throughput()
+        else:
+            raise ValueError(f"Throughput not available for {self.name}")
+ 
 
     def lris2_red(self, grating="R400"):
         '''
@@ -56,7 +85,7 @@ class Instrument:
         self.grating = grating
         self.sheight = 8
         self.swidth = 0.7
-        self.dark = 0.0
+        self.dark = 0.001
         self.readnoise = 3.5
         self.bind = 1
         self.bins = 1
@@ -85,7 +114,7 @@ class Instrument:
         self.grating = grating
         self.sheight = 8
         self.swidth = 0.7
-        self.dark = 0.0
+        self.dark = 0.001
         self.readnoise = 3.5
         self.bind = 1
         self.bins = 1
@@ -98,6 +127,50 @@ class Instrument:
         self.BLUE_CUTOFF = 3100
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
+
+    def lris_red(self, grating="400_8500_D560"):
+        self.name = "LRISr"
+        if grating not in ("400_8500_D560", "600_7500_D680", "600_10000_D560"):
+            raise ValueError(f"Grating {grating} not supported for {self.name}")
+        self.grating = grating
+        self.sheight = 8
+        self.swidth = 1.2
+        self.dark = 0.001
+        self.readnoise = 4.5
+        self.bind = 1
+        self.bins = 1
+        self.scale_para = 0.15
+        self.scale_perp = 0.15
+        self.mag_para = 6.5
+        self.mag_perp = 6.5
+        self.Ang_per_pix = 1.13
+        self.RED_CUTOFF = 10300
+        self.BLUE_CUTOFF = 5500
+
+        self.pixel_size= 15 # 15.0 microns is 0.15 "
+
+    def lris_blue(self, grating="600_4000_D560"):
+        self.name = "LRISb"
+
+        if grating not in ("600_4000_D560"):
+            raise ValueError(f"Grating {grating} not supported for {self.name}")
+
+        self.grating = grating
+        self.sheight = 8
+        self.swidth = 1.2
+        self.dark = 0.001
+        self.readnoise = 3.7
+        self.bind = 1
+        self.bins = 1
+        self.scale_para = 0.15
+        self.scale_perp = 0.15
+        self.mag_para = 6.5
+        self.mag_perp = 6.5
+        self.Ang_per_pix = 0.62
+        self.RED_CUTOFF = 5700
+        self.BLUE_CUTOFF = 3100
+
+        self.pixel_size= 15
 
 
 

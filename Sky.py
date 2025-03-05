@@ -7,14 +7,15 @@ class Sky:
     def __init__(self):
 
         self.sky_dir = 'data/sky'
-        self.bfn = os.path.join(self.sky_dir,'bsky.eps_pang_parcsec.fits')
-        self.rfn = os.path.join(self.sky_dir,'rsky.eps_pang_parcsec_onemicron.fits')
+        #self.bfn = os.path.join(self.sky_dir,'bsky.eps_pang_parcsec.fits')
+        #self.rfn = os.path.join(self.sky_dir,'rsky.eps_pang_parcsec_onemicron.fits')
+        self.fn = os.path.join(self.sky_dir,'sky.eps_pang_parcsec_onemicron.fits')
 
-        self.bpix, self.bwave, self.bspec = self.read_spec(self.bfn)
-        self.rpix, self.rwave, self.rspec = self.read_spec(self.rfn)
+        #self.bpix, self.bwave, self.bspec = self.read_spec(self.bfn)
+        self.pix, self.wave, self.spec = self.read_spec(self.fn)
 
-        self.wave = np.concatenate((self.bwave, self.rwave))
-        self.spec = np.concatenate((self.bspec, self.rspec))
+        #self.wave = np.concatenate((self.bwave, self.rwave))
+        #self.spec = np.concatenate((self.bspec, self.rspec))
 
     def read_spec(self, fn):
 

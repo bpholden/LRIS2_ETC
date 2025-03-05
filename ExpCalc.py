@@ -132,8 +132,10 @@ class ExpCalc():
 
         sky_flux = np.interp(self.waves[in_band], self.sky.wave[sky_band], self.sky.spec[sky_band])
         sky_flux *= npix
+        hours = time/3600
+        noise = self.flux[in_band] + sky_flux + npix*self.instrument.dark*hours + npix*self.instrument.readnoise**2
 
         snr = np.zeros_like(self.waves)
-        snr[in_band] = self.flux[in_band]/np.sqrt(self.flux[in_band] + sky_flux)
+        snr[in_band] = self.flux[in_band]/np.sqrt(noise)
 
         return snr[in_band], in_band

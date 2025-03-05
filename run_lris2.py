@@ -55,6 +55,7 @@ def main(args):
     red_snr, red_good = red_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                       args.slit_width)
 
+    fig, ax = plt.subplots(figsize=(12, 6))
     plt.plot(blue_exp_calc.waves[blue_good], blue_snr, 'b-', label='Blue')
     plt.plot(red_exp_calc.waves[red_good], red_snr, 'r-', label='Red')
     plt.xlabel('Wavelength (Angstroms)')

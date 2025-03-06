@@ -37,9 +37,9 @@ def main(args):
     keck_1 = Telescope.Telescope()
     keck_1.keckone()
     lris2_blue = Instrument.Instrument()
-    lris2_blue.lris2_blue(grating=args.blue_grism)
+    lris2_blue.lris2_blue(keck_1, grating=args.blue_grism)
     lris2_red = Instrument.Instrument()
-    lris2_red.lris2_red(grating=args.red_grism)
+    lris2_red.lris2_red(keck_1, grating=args.red_grism)
 
     blue_exp_calc = ExpCalc.ExpCalc(args.mag, args.filter, args.seeing, args.airmass, \
                                     args.redshift, args.template, lris2_blue, keck_1)
@@ -55,7 +55,7 @@ def main(args):
     red_snr, red_good = red_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                       args.slit_width)
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    _, _ = plt.subplots(figsize=(12, 6))
     plt.plot(blue_exp_calc.waves[blue_good], blue_snr, 'b-', label='Blue')
     plt.plot(red_exp_calc.waves[red_good], red_snr, 'r-', label='Red')
     plt.xlabel('Wavelength (Angstroms)')

@@ -35,14 +35,14 @@ def main():
     keck_1 = Telescope.Telescope()
     keck_1.keckone()
     lris2_blue = Instrument.Instrument()
-    lris2_blue.lris2_blue()
+    lris2_blue.lris2_blue(keck_1)
     lris2_red = Instrument.Instrument()
-    lris2_red.lris2_red()
+    lris2_red.lris2_red(keck_1)
 
     lris_blue = Instrument.Instrument()
-    lris_blue.lris_blue()
+    lris_blue.lris_blue(keck_1)
     lris_red = Instrument.Instrument()
-    lris_red.lris_red()
+    lris_red.lris_red(keck_1)
 
     blue2_exp_calc = ExpCalc.ExpCalc(args.mag, args.filter, args.seeing, args.airmass, \
                                     args.redshift, args.template, lris2_blue, keck_1)

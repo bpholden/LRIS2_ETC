@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import Sky
 import Mag
 import Transmission
-
+import Moffat
 
 class ExpCalc():
     """
@@ -85,6 +85,7 @@ class ExpCalc():
             self.instrument = inst
         self.instrument.slit_length = slit_length
         self.instrument.slit_width = slit_width
+        frac = Moffat.moffat_frac(slit_length, slit_width, self.seeing, pix_size=self.instrument.pixel_size)
 
         self.mag = Mag.Mag(self.filter)
         self.read_template()
@@ -92,6 +93,7 @@ class ExpCalc():
         self.flux *= 10**(0.4*(self.abs_mag - self.app_mag))
 
         self.flux *= time
+        self.flux *= frac
         self.sky.spec *= time
 
         self.sky.wave, self.sky.spec = Sky.rescale(self.instrument, \

@@ -85,7 +85,8 @@ class ExpCalc():
             self.instrument = inst
         self.instrument.slit_length = slit_length
         self.instrument.slit_width = slit_width
-        frac = Moffat.moffat_frac(slit_length, slit_width, self.seeing, pix_size=self.instrument.pixel_size)
+        frac = Moffat.moffat_frac(self.seeing, slit_width, slit_length, \
+                                  pix_size=self.instrument.scale_perp)
 
         self.mag = Mag.Mag(self.filter)
         self.read_template()

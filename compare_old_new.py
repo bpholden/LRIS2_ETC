@@ -52,7 +52,7 @@ def main():
                                     args.redshift, args.template, lris_blue, keck_1)
     red_exp_calc = ExpCalc.ExpCalc(args.mag, args.filter, args.seeing, args.airmass, \
                                       args.redshift, args.template, lris_red, keck_1)
-    
+
     if args.flux_plots:
         blue2_exp_calc.flux_plots = True
         red2_exp_calc.flux_plots = True

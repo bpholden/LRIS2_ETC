@@ -69,7 +69,7 @@ class Instrument:
             self.read_xidl_throughput()
         else:
             raise ValueError(f"Throughput not available for {self.name}")
- 
+
 
     def lris2_red(self, grating="R400"):
         '''
@@ -129,6 +129,10 @@ class Instrument:
         self.pixel_size= 15 # 15.0 microns is 0.15 "
 
     def lris_red(self, grating="400_8500_D560"):
+        '''
+        lris_red(self, grating="400_8500_D560")
+        '''
+
         self.name = "LRISr"
         if grating not in ("400_8500_D560", "600_7500_D680", "600_10000_D560"):
             raise ValueError(f"Grating {grating} not supported for {self.name}")
@@ -150,8 +154,11 @@ class Instrument:
         self.pixel_size= 15 # 15.0 microns is 0.15 "
 
     def lris_blue(self, grating="600_4000_D560"):
-        self.name = "LRISb"
+        '''
+        lris_blue(self, grating="600_4000_D560")
+        '''
 
+        self.name = "LRISb"
         if grating not in ("600_4000_D560"):
             raise ValueError(f"Grating {grating} not supported for {self.name}")
 
@@ -175,37 +182,32 @@ class Instrument:
 
 
 
-def deimos(tel,slit=1.0,grating="600"):
-    dei = instrument()
-    dei.MAG_PERP = 8.03  # Modified to give observed resolution 0.75" maps to 4.5 pixels
-    dei.MAG_PARA = 8.03  # Same
-    dei.PIXEL_SIZE = 15.0 # in microns
+    def deimos(self, tel, grating="600"):
+        '''
+        deimos(self, grating="600")
+        '''
+        self.mag_perp = 8.03  # Modified to give observed resolution 0.75" maps to 4.5 pixels
+        self.mag_para = 8.03  # Same
+        self.pixel_size = 15.0 # in microns
 
-    dei.SCALE_PERP = tel.PLATE_SCALE*dei.MAG_PERP*(dei.PIXEL_SIZE/1000.) # Arcsec
-    dei.SCALE_PARA = tel.PLATE_SCALE*dei.MAG_PARA*(dei.PIXEL_SIZE/1000.) # Arcsec
+        self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
+        self.scale_para = tel.plate_scale*self.mag_para*(self.pixel_size/1000.)
 
-    dei.grating = grating
-    if grating == "600":
-        dei.R     = 11538.5    # 1 pixel (native) dispersion
-    elif grating == "1200":
-        dei.R    = 22727.3    # 1 pixel (native) dispersion
-    elif grating == "900":
-        dei.R    = 17307.8    # 1 pixel (native) dispersion
+        self.grating = grating
+        if grating == "600":
+            self.R     = 11538.5    # 1 pixel (native) dispersion
+        elif grating == "1200":
+            self.R    = 22727.3    # 1 pixel (native) dispersion
+        elif grating == "900":
+            self.R    = 17307.8    # 1 pixel (native) dispersion
 
+        ## Detector
+        self.readnoise = 2.6
+        self.dark = 0.001  # electrons/pix/hr
+        self.bind = 1
+        self.bins = 1
 
-    ## Detector
-    dei.readno = 2.6
-    dei.dark = 4.  # electrons/pix/hr
-    dei.bind = 1
-    dei.bins = 1
-
-    ## Wavelength range
-    dei.wvmnx = [4000., 10000.]
-
-    ## Slit
-    dei.swidth = slit
-    dei.sheight = 10.0  # arcsec
-
-    # dei.throughput = 
-
-    return dei
+        ## Wavelength range
+        self.RED_CUTOFF = 10000
+        self.BLUE_CUTOFF = 4000
+        # dei.throughput

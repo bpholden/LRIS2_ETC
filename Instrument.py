@@ -71,7 +71,7 @@ class Instrument:
             raise ValueError(f"Throughput not available for {self.name}")
 
 
-    def lris2_red(self, grating="R400"):
+    def lris2_red(self, tel, grating="R400"):
         '''
         lris2_red(self, grating="R400")
 
@@ -89,17 +89,17 @@ class Instrument:
         self.readnoise = 3.5
         self.bind = 1
         self.bins = 1
-        self.scale_para = 0.15
-        self.scale_perp = 0.15
-        self.mag_para = 7.4
-        self.mag_perp = 7.4
+        self.mag_para = 7.3
+        self.mag_perp = 7.3
         self.Ang_per_pix = 1.13 #
         self.BLUE_CUTOFF = 5500
         self.RED_CUTOFF = 9500
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
+        self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
+        self.scale_para = tel.plate_scale*self.mag_para*(self.pixel_size/1000.)
 
-    def lris2_blue(self, grating="B600"):
+    def lris2_blue(self, tel, grating="B600"):
         '''
         lris2_blue(self, grating="B600")
 
@@ -118,17 +118,17 @@ class Instrument:
         self.readnoise = 3.5
         self.bind = 1
         self.bins = 1
-        self.scale_para = 0.15
-        self.scale_perp = 0.15
-        self.mag_para = 7.4
-        self.mag_perp = 7.4
+        self.mag_para = 7.3
+        self.mag_perp = 7.3
         self.Ang_per_pix = 0.62 #
         self.RED_CUTOFF = 5700
         self.BLUE_CUTOFF = 3100
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
+        self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
+        self.scale_para = tel.plate_scale*self.mag_para*(self.pixel_size/1000.)
 
-    def lris_red(self, grating="400_8500_D560"):
+    def lris_red(self, tel, grating="400_8500_D560"):
         '''
         lris_red(self, grating="400_8500_D560")
         '''
@@ -145,15 +145,17 @@ class Instrument:
         self.bins = 1
         self.scale_para = 0.15
         self.scale_perp = 0.15
-        self.mag_para = 6.5
-        self.mag_perp = 6.5
         self.Ang_per_pix = 1.16
         self.RED_CUTOFF = 10300
         self.BLUE_CUTOFF = 5500
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
 
-    def lris_blue(self, grating="600_4000_D560"):
+        self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
+        self.scale_para = tel.plate_scale*self.mag_para*(self.pixel_size/1000.)
+
+
+    def lris_blue(self, tel, grating="600_4000_D560"):
         '''
         lris_blue(self, grating="600_4000_D560")
         '''
@@ -169,8 +171,6 @@ class Instrument:
         self.readnoise = 3.7
         self.bind = 1
         self.bins = 1
-        self.scale_para = 0.15
-        self.scale_perp = 0.15
         self.mag_para = 6.5
         self.mag_perp = 6.5
         self.Ang_per_pix = 0.63
@@ -179,7 +179,8 @@ class Instrument:
 
         self.pixel_size= 15
 
-
+        self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
+        self.scale_para = tel.plate_scale*self.mag_para*(self.pixel_size/1000.)
 
 
     def deimos(self, tel, grating="600"):

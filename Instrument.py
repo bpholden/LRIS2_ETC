@@ -143,7 +143,7 @@ class Instrument:
         self.scale_perp = 0.15
         self.mag_para = 6.5
         self.mag_perp = 6.5
-        self.Ang_per_pix = 1.13
+        self.Ang_per_pix = 1.16
         self.RED_CUTOFF = 10300
         self.BLUE_CUTOFF = 5500
 
@@ -166,7 +166,7 @@ class Instrument:
         self.scale_perp = 0.15
         self.mag_para = 6.5
         self.mag_perp = 6.5
-        self.Ang_per_pix = 0.62
+        self.Ang_per_pix = 0.63
         self.RED_CUTOFF = 5700
         self.BLUE_CUTOFF = 3100
 

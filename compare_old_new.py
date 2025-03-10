@@ -23,8 +23,8 @@ def parse_args():
     parser.add_argument('--mag', '-m', type=float, default=22, help='filter magnitude')
     parser.add_argument('--filter', '-f', type=str, default='sdss_rprime.dat', \
                         help='Filter file (SDSS r)')
-    parser.add_argument('--template', '-T', type=str, default='starb1_template.fits', \
-                        help='Template file')
+    parser.add_argument('--template', '-T', type=str, default='starb1', \
+                        help='Template file (starb1)')
     parser.add_argument('--flux_plots', action='store_true', help='make flux plots')
     return parser.parse_args()
 

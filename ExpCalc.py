@@ -27,7 +27,7 @@ class ExpCalc():
         self.seeing = seeing
         self.filter = mfilter
         self.redshift = redshift
-        self.template_filename = template_filename
+        self.template_filename = f"{template_filename}_template.fits"
         self.flux_plots = False
 
 

@@ -25,8 +25,8 @@ def parse_args():
                         help='Filter file (SDSS r)')
     parser.add_argument('--red_grism', type=str, default='R400', help='Red Grism (R400)')
     parser.add_argument('--blue_grism', type=str, default='B600', help='Blue Grism (B600)')
-    parser.add_argument('--template', '-T', type=str, default='starb1_template.fits', \
-                        help='Template file')
+    parser.add_argument('--template', '-T', type=str, default='starb1', \
+                        help='Template file (starb1)')
     parser.add_argument('--flux_plots', action='store_true', help='make flux plots')
     return parser.parse_args()
 

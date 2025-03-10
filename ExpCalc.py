@@ -55,9 +55,11 @@ class ExpCalc():
         compute_throughput(self)
         """
         self.instrument.read_throughput()
-        throughput_interp = np.interp(self.waves, self.instrument.throughput['wavelength'],\
+        good_waves = (self.waves > self.instrument.BLUE_CUTOFF) &\
+                        (self.waves < self.instrument.RED_CUTOFF)
+        throughput_interp = np.interp(self.waves[good_waves], self.instrument.throughput['wavelength'],\
                                        self.instrument.throughput['throughput'])
-        self.flux *= throughput_interp
+        self.flux[good_waves] *= throughput_interp
         return
 
     def read_template(self):

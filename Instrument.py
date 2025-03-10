@@ -147,7 +147,7 @@ class Instrument:
         self.scale_perp = 0.15
         self.Ang_per_pix = 1.16
         self.RED_CUTOFF = 10300
-        self.BLUE_CUTOFF = 5500
+        self.BLUE_CUTOFF = 5600
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
 
@@ -174,7 +174,7 @@ class Instrument:
         self.mag_para = 6.5
         self.mag_perp = 6.5
         self.Ang_per_pix = 0.63
-        self.RED_CUTOFF = 5700
+        self.RED_CUTOFF = 5600
         self.BLUE_CUTOFF = 3100
 
         self.pixel_size= 15

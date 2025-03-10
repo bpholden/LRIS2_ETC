@@ -15,6 +15,12 @@ class Mag:
             self.read_filter(fn)
             self.lambda_eff = self.compute_lambda_eff()
 
+    def __repr__(self):
+        return f'<Mag {self.fn} {self.lambda_eff:0.2f}>'
+    
+    def __str__(self):
+        return f'<Mag {self.fn} {self.lambda_eff:0.2f}>'
+
     def read_filter(self, fn):
         '''
         read in a filter file

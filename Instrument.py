@@ -45,8 +45,8 @@ class Instrument:
         grating_filename = os.path.join(self.throughput_dir, short_name)
         hdus = astropy.io.fits.open(grating_filename)
         self.throughput = {}
-        self.throughput['wavelength'] = hdus[2].data['WAV']
-        self.throughput['throughput'] = hdus[2].data['EFF']
+        self.throughput['wavelength'] = hdus[2].data['WAV'][0]
+        self.throughput['throughput'] = hdus[2].data['EFF'][0]
 
     def read_lris2_throughput(self):
         '''

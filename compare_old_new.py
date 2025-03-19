@@ -68,15 +68,23 @@ def main():
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                         args.slit_width)
 
-    _, _ = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(2, 1, layout='constrained', figsize=(12, 12))
 
-    plt.plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.snr, 'b-', label='Blue2')
-    plt.plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.snr, 'r-', label='Red2')
-    plt.plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b--', label='Blue')
-    plt.plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.snr, 'r--', label='Red')
+    ax[0].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.snr, 'b-', label='Blue2')
+    ax[0].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.snr, 'r-', label='Red2')
+    ax[0].plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b--', label='Blue')
+    ax[0].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.snr, 'r--', label='Red')
+    ax[0].set_xlabel(r'Wavelength ($\AA$)')
+    ax[0].set_ylabel('SNR')
+
+    ax[1].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.flux[blue2_exp_calc.in_band], 'b-', label='Blue2')
+    ax[1].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.flux[red2_exp_calc.in_band], 'r-', label='Red2')
+    ax[1].plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.flux[blue_exp_calc.in_band], 'b--', label='Blue')
+    ax[1].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.flux[red_exp_calc.in_band], 'r--', label='Red')
+    ax[1].set_xlabel(r'Wavelength ($\AA$)')
+    ax[1].set_ylabel(r'Photons ($\gamma\ \AA^{-1}$)')
+
     plt.legend()
-    plt.xlabel(r'Wavelength ($\AA$)')
-    plt.ylabel('SNR')
     plt.show()
 
 if __name__ == '__main__':

@@ -90,8 +90,8 @@ class ExpCalc():
             self.telescope = telescope
         if inst:
             self.instrument = inst
-        self.instrument.slit_length = slit_length
-        self.instrument.slit_width = slit_width
+        self.instrument.sheight = slit_length
+        self.instrument.swidth = slit_width
         frac = Moffat.moffat_frac(self.seeing, slit_width, slit_length, \
                                   pix_size=self.instrument.scale_perp)
 
@@ -105,7 +105,7 @@ class ExpCalc():
         self.sky.spec *= time
 
         self.sky.spec = Sky.rescale(self.instrument, \
-                                                     self.sky.spec)
+                                        self.sky.spec)
         self.flux = self.flux * self.telescope.area
 
         if self.flux_plots:

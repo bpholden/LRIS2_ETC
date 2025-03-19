@@ -104,8 +104,8 @@ class ExpCalc():
         self.flux *= frac
         self.sky.spec *= time
 
-        self.sky.wave, self.sky.spec = Sky.rescale(self.instrument, \
-                                                     self.sky.wave, self.sky.spec)
+        self.sky.spec = Sky.rescale(self.instrument, \
+                                                     self.sky.spec)
         self.flux = self.flux * self.telescope.area
 
         if self.flux_plots:

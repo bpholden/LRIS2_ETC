@@ -143,13 +143,14 @@ class Instrument:
         self.readnoise = 4.5
         self.bind = 1
         self.bins = 1
-        self.scale_para = 0.15
-        self.scale_perp = 0.15
+        self.mag_para = 6.5
+        self.mag_perp = 6.5
+
         self.Ang_per_pix = 1.16
         self.RED_CUTOFF = 10300
         self.BLUE_CUTOFF = 5600
 
-        self.pixel_size= 15 # 15.0 microns is 0.15 "
+        self.pixel_size= 15 
 
         self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
         self.scale_para = tel.plate_scale*self.mag_para*(self.pixel_size/1000.)
@@ -177,7 +178,7 @@ class Instrument:
         self.RED_CUTOFF = 5600
         self.BLUE_CUTOFF = 3100
 
-        self.pixel_size= 15
+        self.pixel_size= 13.5
 
         self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
         self.scale_para = tel.plate_scale*self.mag_para*(self.pixel_size/1000.)

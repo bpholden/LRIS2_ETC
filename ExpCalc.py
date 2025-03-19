@@ -17,17 +17,22 @@ class ExpCalc():
         self.telescope = telescope
         self.instrument = inst
         self.sky = Sky.Sky()
-        self.mag = None
-        self.app_mag = app_mag
-        self.abs_mag = None
-        self.transmission = Transmission.Transmission()
-        self.flux = None
-        self.waves = None
         self.airmass = airmass
         self.seeing = seeing
         self.filter = mfilter
         self.redshift = redshift
         self.template_filename = f"{template_filename}_template.fits"
+        self.app_mag = app_mag
+
+        self.mag = None
+        self.abs_mag = None
+        self.transmission = Transmission.Transmission()
+        self.flux = None
+        self.waves = None
+        self.noise = None
+        self.snr = None
+        self.sky_flux = None
+        self.in_band = None
         self.flux_plots = False
 
 
@@ -111,12 +116,12 @@ class ExpCalc():
             plt.title(f'Flux {self.instrument.name}')
             plt.show()
 
-        self.flux *= self.instrument.Ang_per_pix
+        #self.flux *= self.instrument.Ang_per_pix
         self.photons()
         if self.flux_plots:
             plt.plot(self.waves, self.flux, 'k-')
             plt.xlabel(r'Wavelength ($\AA$)')
-            plt.ylabel(r'($\gamma\ pix^{-1}$)')
+            plt.ylabel(r'($\gamma\ \AA^{-1}$)')
             plt.title(f'Photons {self.instrument.name}')
             plt.show()
         self.compute_extinction()
@@ -124,25 +129,25 @@ class ExpCalc():
         if self.flux_plots:
             plt.plot(self.waves, self.flux, 'k-')
             plt.xlabel(r'Wavelength ($\AA$)')
-            plt.ylabel(r'($\gamma\ pix^{-1}$)')
+            plt.ylabel(r'($\gamma\ \AA^{-1}$)')
             plt.title(f'Photons after throughput and extinction {self.instrument.name}')
             plt.show()
 
         npix = int(self.seeing / self.instrument.scale_perp)
 
-        in_band = (self.waves > self.instrument.BLUE_CUTOFF) &\
+        self.in_band = (self.waves > self.instrument.BLUE_CUTOFF) &\
               (self.waves < self.instrument.RED_CUTOFF)
         sky_band = (self.sky.wave > self.instrument.BLUE_CUTOFF) &\
               (self.sky.wave < self.instrument.RED_CUTOFF)
 
-        sky_flux = np.interp(self.waves[in_band], self.sky.wave[sky_band], self.sky.spec[sky_band])
-        sky_flux *= npix
-        noise = self.flux[in_band]
-        noise += sky_flux
-        noise += npix*self.instrument.dark*time
-        noise += npix*self.instrument.readnoise**2
+        self.sky_flux = np.interp(self.waves[self.in_band], self.sky.wave[sky_band], self.sky.spec[sky_band])
+        self.sky_flux *= npix
+        self.noise = self.flux[self.in_band]
+        self.noise += self.sky_flux
+        self.noise += npix*self.instrument.dark*time
+        self.noise += npix*self.instrument.readnoise**2
 
-        snr = np.zeros_like(self.waves)
-        snr[in_band] = self.flux[in_band]/np.sqrt(noise)
+        self.snr = np.zeros_like(self.waves)
+        self.snr[self.in_band] = self.flux[self.in_band]/np.sqrt(self.noise)
 
-        return snr[in_band], in_band
+        return 

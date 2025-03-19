@@ -134,6 +134,8 @@ class ExpCalc():
             plt.show()
 
         npix = int(self.seeing / self.instrument.scale_perp)
+        if npix < 2:
+            npix = 2
 
         self.in_band = (self.waves > self.instrument.BLUE_CUTOFF) &\
               (self.waves < self.instrument.RED_CUTOFF)
@@ -147,7 +149,7 @@ class ExpCalc():
         self.noise += npix*self.instrument.dark*time
         self.noise += npix*self.instrument.readnoise**2
 
-        self.snr = np.zeros_like(self.waves)
-        self.snr[self.in_band] = self.flux[self.in_band]/np.sqrt(self.noise)
+        self.snr = np.zeros_like(self.waves[self.in_band])
+        self.snr = self.flux[self.in_band]/np.sqrt(self.noise)
 
         return 

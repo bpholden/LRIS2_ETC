@@ -106,6 +106,7 @@ class ExpCalc():
 
         self.sky.wave, self.sky.spec = Sky.rescale(self.instrument, \
                                                      self.sky.wave, self.sky.spec)
+        # the sky flux is in e-/s/Ang for single column of pixels
         self.flux = self.flux * self.telescope.area
 
         if self.flux_plots:

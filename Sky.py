@@ -38,7 +38,7 @@ class Sky:
         #spec *= instrument.Ang_per_pix
         # this should be e-/pix/s
 
-    return spec
+        return
 
 def compute_dwave(wave, R):
 

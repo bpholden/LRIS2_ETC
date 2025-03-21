@@ -58,14 +58,13 @@ def compute_extinction(wave, spec, airmass=1.0):
 
 def main():
 
-    keck_1 = Telescope.Telescope()
-    keck_1.keckone()
+    keck_1 = Telescope.Telescope(name='keck1')
     args = parse_args()
 
     lrisred = Instrument.Instrument()
-    lrisred.lris2_red()
+    lrisred.lris2_red(keck_1)
     lrisblue = Instrument.Instrument()
-    lrisblue.lris2_blue()
+    lrisblue.lris2_blue(keck_1)
 
     lrisred.swidth = args.slit_width
     lrisblue.swidth = args.slit_width
@@ -82,14 +81,15 @@ def main():
     scale = 10**(0.4*(abs_mag - args.mag))
     flux *= scale
 
-    sky = Sky.Sky()
+    bsky = Sky.Sky()
+    rsky = Sky.Sky()
 
     flux *= args.time
-    sky.bspec *= args.time
-    sky.rspec *= args.time
+    bsky.spec *= args.time
+    rsky.spec *= args.time
 
-    sky.bwave, sky.bspec = Sky.rescale(lrisblue, sky.bwave, sky.bspec)
-    sky.rwave, sky.rspec = Sky.rescale(lrisred, sky.rwave, sky.rspec)
+    bsky.rescale(lrisblue)
+    rsky.rescale(lrisred)
 
     if args.flux_plots:
         plt.plot(waves, flux, 'k-')
@@ -115,14 +115,14 @@ def main():
     blue_npix = int(args.seeing / lrisblue.scale_perp)
 
     in_band = (waves > BLUE_CUTOFF) & (waves < RED_CUTOFF)
-    sky_red_band = (sky.rwave > DICHROIC) & (sky.rwave < RED_CUTOFF)
-    sky_blue_band = (sky.bwave > BLUE_CUTOFF) & (sky.bwave <= DICHROIC)
+    rsky_red_band = (rsky.wave > DICHROIC) & (rsky.wave < RED_CUTOFF)
+    bsky_blue_band = (bsky.wave > BLUE_CUTOFF) & (bsky.wave <= DICHROIC)
 
     blue_waves = (waves > BLUE_CUTOFF) & (waves <= DICHROIC)
     red_waves = (waves > DICHROIC) & (waves < RED_CUTOFF)
 
-    sky_bflux = np.interp(waves[blue_waves], sky.bwave[sky_blue_band], sky.bspec[sky_blue_band])
-    sky_rflux = np.interp(waves[red_waves], sky.rwave[sky_red_band], sky.rspec[sky_red_band])
+    sky_bflux = np.interp(waves[blue_waves], bsky.wave[bsky_blue_band], bsky.spec[bsky_blue_band])
+    sky_rflux = np.interp(waves[red_waves], rsky.wave[rsky_red_band], rsky.spec[rsky_red_band])
 
     sky_bflux *= blue_npix
     sky_rflux *= red_npix

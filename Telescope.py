@@ -1,9 +1,16 @@
 class Telescope(object):
 
-    def __init__(self):
+    def __init__(self, name=None):
         self.name = '' # KeckI, KeckII, Lick-3m
         self.area= 0.
         self.plate_scale= 0.
+        if name:
+            if name.lower() == 'keck1':
+                self.keckone()
+            elif name.lower() == 'keck2':
+                self.kecktwo()
+            elif name.lower() == 'lick':
+                self.lick()
 
     def __repr__(self):
          return '<Telescope "%s" %f %f>' % (self.name, self.area, self.plate_scale)
@@ -27,4 +34,3 @@ class Telescope(object):
     def kecktwo(self):
         self.keck()
         self.name = 'KeckII'
-

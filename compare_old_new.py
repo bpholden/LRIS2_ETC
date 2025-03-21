@@ -60,15 +60,15 @@ def main():
         red_exp_calc.flux_plots = True
 
     blue2_exp_calc.compute_spectrum(args.time, args.slit_length,\
-                                                            args.slit_width)
+                                                args.slit_width)
     red2_exp_calc.compute_spectrum(args.time, args.slit_length, \
-                                                        args.slit_width)
+                                                args.slit_width)
     blue_exp_calc.compute_spectrum(args.time, args.slit_length,\
-                                                            args.slit_width)
+                                                args.slit_width)
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
-                                                        args.slit_width)
+                                                args.slit_width)
 
-    fig, ax = plt.subplots(2, 1, layout='constrained', figsize=(12, 12))
+    fig, ax = plt.subplots(3, 1, layout='constrained', figsize=(12, 18))
 
     ax[0].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.snr, 'b-', label='Blue2')
     ax[0].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.snr, 'r-', label='Red2')
@@ -83,6 +83,13 @@ def main():
     ax[1].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.flux[red_exp_calc.in_band], 'r--', label='Red')
     ax[1].set_xlabel(r'Wavelength ($\AA$)')
     ax[1].set_ylabel(r'Photons ($\gamma\ \AA^{-1}$)')
+
+    ax[2].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.sky_flux, 'b-', label='Blue2')
+    ax[2].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.sky_flux, 'r-', label='Red2')
+    ax[2].plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.sky_flux, 'b--', label='Blue')
+    ax[2].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.sky_flux, 'r--', label='Red')
+    ax[2].set_xlabel(r'Wavelength ($\AA$)')
+    ax[2].set_ylabel(r'Sky Photons ($\gamma\ \AA^{-1}$)')
 
     plt.legend()
     plt.show()

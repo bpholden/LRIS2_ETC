@@ -32,7 +32,7 @@ def rescale(instrument, wave, spec):
 
     #instrument.Ang_per_pix *= instrument.pixel_size # dwave is for a 1" slit
     sq_arcsec = instrument.swidth * instrument.sheight
-    spec *= sq_arcsec * instrument.Ang_per_pix
+    spec *= sq_arcsec #* instrument.Ang_per_pix
         # this should be e-/pix/s
 
     return wave, spec

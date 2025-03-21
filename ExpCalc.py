@@ -111,7 +111,7 @@ class ExpCalc():
             plt.title(f'Flux {self.instrument.name}')
             plt.show()
 
-        self.flux *= self.instrument.Ang_per_pix
+        #self.flux *= self.instrument.Ang_per_pix
         self.photons()
         if self.flux_plots:
             plt.plot(self.waves, self.flux, 'k-')

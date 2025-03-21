@@ -1,5 +1,7 @@
 class Telescope(object):
-
+    '''
+    Class to hold telescope parameters
+    '''
     def __init__(self, name=None):
         self.name = '' # KeckI, KeckII, Lick-3m
         self.area= 0.

@@ -156,7 +156,7 @@ class ExpCalc():
                                   self.sky.spec[sky_band])
         self.sky_flux *= npix
 
-        #self.sky_flux = self.scale_sky_by_throughput(self.waves[self.in_band], self.sky_flux)
+        self.sky_flux = self.scale_sky_by_throughput(self.waves[self.in_band], self.sky_flux)
 
         self.noise = self.flux[self.in_band]
         self.noise += self.sky_flux

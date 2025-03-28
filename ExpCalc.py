@@ -152,7 +152,8 @@ class ExpCalc():
         sky_band = (self.sky.wave > self.instrument.BLUE_CUTOFF) &\
               (self.sky.wave < self.instrument.RED_CUTOFF)
 
-        self.sky_flux = np.interp(self.waves[self.in_band], self.sky.wave[sky_band], self.sky.spec[sky_band])
+        self.sky_flux = np.interp(self.waves[self.in_band], self.sky.wave[sky_band], \
+                                  self.sky.spec[sky_band])
         self.sky_flux *= npix
 
         #self.sky_flux = self.scale_sky_by_throughput(self.waves[self.in_band], self.sky_flux)

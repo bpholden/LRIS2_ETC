@@ -68,7 +68,7 @@ def main():
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                 args.slit_width)
 
-    fig, ax = plt.subplots(3, 1, layout='constrained', figsize=(12, 18))
+    _, ax = plt.subplots(3, 1, layout='constrained', figsize=(12, 12))
 
     ax[0].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.snr, 'b-', label='Blue2')
     ax[0].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.snr, 'r-', label='Red2')

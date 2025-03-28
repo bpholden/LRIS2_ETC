@@ -10,7 +10,8 @@ class Sky:
         #self.bfn = os.path.join(self.sky_dir,'bsky.eps_pang_parcsec.fits')
         #self.rfn = os.path.join(self.sky_dir,'rsky.eps_pang_parcsec_onemicron.fits')
         self.fn = os.path.join(self.sky_dir,'sky.eps_pang_parcsec_onemicron.fits')
-
+        # note this in e-/s/Ang/arcsec^2  
+    
         #self.bpix, self.bwave, self.bspec = self.read_spec(self.bfn)
         self.pix, self.wave, self.spec = self.read_spec(self.fn)
 

@@ -67,6 +67,17 @@ class ExpCalc():
         self.flux[good_waves] *= throughput_interp
         return
 
+    def scale_sky_by_throughput(self, sky_waves, sky_photons):
+        """
+        scale_sky_by_throughput(self, sky_waves, sky_photons)
+        """
+        good_waves = (sky_waves > self.instrument.BLUE_CUTOFF) &\
+                        (sky_waves < self.instrument.RED_CUTOFF)
+        throughput_interp = np.interp(sky_waves[good_waves], self.instrument.throughput['wavelength'],\
+                                       self.instrument.throughput['throughput'])
+        sky_photons *= throughput_interp
+        return sky_photons
+
     def read_template(self):
         """
         read_template(self)
@@ -143,6 +154,9 @@ class ExpCalc():
 
         self.sky_flux = np.interp(self.waves[self.in_band], self.sky.wave[sky_band], self.sky.spec[sky_band])
         self.sky_flux *= npix
+
+        #self.sky_flux = self.scale_sky_by_throughput(self.waves[self.in_band], self.sky_flux)
+
         self.noise = self.flux[self.in_band]
         self.noise += self.sky_flux
         self.noise += npix*self.instrument.dark*time

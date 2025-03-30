@@ -143,7 +143,7 @@ class ExpCalc():
             plt.title(f'Photons after throughput and extinction {self.instrument.name}')
             plt.show()
 
-        npix = int(self.seeing / self.instrument.scale_perp)
+        npix = int(slit_length )
         if npix < 2:
             npix = 2
 
@@ -154,7 +154,7 @@ class ExpCalc():
 
         self.sky_flux = np.interp(self.waves[self.in_band], self.sky.wave[sky_band], \
                                   self.sky.spec[sky_band])
-        self.sky_flux *= npix
+        self.sky_flux *= slit_length
 
         self.sky_flux = self.scale_sky_by_throughput(self.waves[self.in_band], self.sky_flux)
 

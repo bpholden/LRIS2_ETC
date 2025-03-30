@@ -83,6 +83,8 @@ def main():
     ax[1].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.flux[red_exp_calc.in_band], 'r--', label='Red')
     ax[1].set_xlabel(r'Wavelength ($\AA$)')
     ax[1].set_ylabel(r'Photons ($\gamma\ \AA^{-1}$)')
+    #ax[1].set_ylim(0, 1.5e3)
+    ax[1].set_yscale('log')
 
     ax[2].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.sky_flux, 'b-', label='Blue2')
     ax[2].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.sky_flux, 'r-', label='Red2')
@@ -90,6 +92,8 @@ def main():
     ax[2].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.sky_flux, 'r--', label='Red')
     ax[2].set_xlabel(r'Wavelength ($\AA$)')
     ax[2].set_ylabel(r'Sky Photons ($\gamma\ \AA^{-1}$)')
+    #ax[2].set_ylim(0, 1.5e3)
+    ax[2].set_yscale('log')
 
     plt.legend()
     plt.show()

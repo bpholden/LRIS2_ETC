@@ -29,6 +29,8 @@ class ExpCalc():
         self.transmission = Transmission.Transmission()
         self.flux = None
         self.waves = None
+        self.good_waves = None
+        self.throughput_interp = None
         self.noise = None
         self.snr = None
         self.sky_flux = None
@@ -60,11 +62,11 @@ class ExpCalc():
         compute_throughput(self)
         """
         self.instrument.read_throughput()
-        good_waves = (self.waves > self.instrument.BLUE_CUTOFF) &\
+        self.good_waves = (self.waves > self.instrument.BLUE_CUTOFF) &\
                         (self.waves < self.instrument.RED_CUTOFF)
-        throughput_interp = np.interp(self.waves[good_waves], self.instrument.throughput['wavelength'],\
+        self.throughput_interp = np.interp(self.waves[self.good_waves], self.instrument.throughput['wavelength'],\
                                        self.instrument.throughput['throughput'])
-        self.flux[good_waves] *= throughput_interp
+        self.flux[self.good_waves] *= self.throughput_interp
         return
 
     def scale_sky_by_throughput(self, sky_waves, sky_photons):

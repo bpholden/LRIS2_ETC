@@ -50,16 +50,17 @@ blue_waves = blue_exp_calc.waves[blue_exp_calc.good_waves]
 red_waves = red_exp_calc.waves[red_exp_calc.good_waves]
 
 plt.plot(blue2_waves,
-         blue2_exp_calc.throughput_interp, 'b-', label='lris2 blue')
+         100*blue2_exp_calc.throughput_interp, 'b-', label='LRIS-2 B600')
 plt.plot(red2_waves,
-          red2_exp_calc.throughput_interp, 'r-', label='lris2 red')
+          100*red2_exp_calc.throughput_interp, 'r-', label='LRIS-2 R400')
 plt.plot(blue_waves,
-          blue_exp_calc.throughput_interp, 'b--', label='lris blue')
+          100*blue_exp_calc.throughput_interp, 'b--', label='LRIS 600/4000')
 plt.plot(red_waves,
-          red_exp_calc.throughput_interp, 'r--', label='lris red')
+          100*red_exp_calc.throughput_interp, 'r--', label='LRIS 400/8500')
 plt.xlabel(r'Wavelength ($\AA$)')
 plt.ylabel('Throughput')
 plt.legend()
+plt.ylim(0, 100)
 plt.show()
 
 red_np_interp = np.interp(red2_waves, red_exp_calc.instrument.throughput['wavelength'],\

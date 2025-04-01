@@ -52,7 +52,7 @@ class Instrument:
         '''
         read_lris2_throughput(self)
         '''
-        grating_filename = os.path.join(self.throughput_dir, self.grating + "_eff.csv")
+        grating_filename = os.path.join(self.throughput_dir, self.grating + "_tot_eff.csv")
         self.throughput = astropy.io.ascii.read(grating_filename)
         self.throughput['wavelength'] *= 10 # we work in Angstroms but these tables are in nm
 

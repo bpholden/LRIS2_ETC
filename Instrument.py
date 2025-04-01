@@ -92,8 +92,8 @@ class Instrument:
         self.mag_para = 7.3
         self.mag_perp = 7.3
         self.Ang_per_pix = 1.13 #
-        self.BLUE_CUTOFF = 5500
-        self.RED_CUTOFF = 9500
+        self.BLUE_CUTOFF = 5500.0
+        self.RED_CUTOFF = 9500.0
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
         self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
@@ -121,8 +121,8 @@ class Instrument:
         self.mag_para = 7.3
         self.mag_perp = 7.3
         self.Ang_per_pix = 0.62 #
-        self.RED_CUTOFF = 5700
-        self.BLUE_CUTOFF = 3100
+        self.RED_CUTOFF = 5700.0
+        self.BLUE_CUTOFF = 3100.0
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
         self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
@@ -147,8 +147,8 @@ class Instrument:
         self.mag_perp = 6.5
 
         self.Ang_per_pix = 1.16
-        self.RED_CUTOFF = 10300
-        self.BLUE_CUTOFF = 5600
+        self.RED_CUTOFF = 10300.0
+        self.BLUE_CUTOFF = 5600.0
 
         self.pixel_size= 15 
 
@@ -175,8 +175,8 @@ class Instrument:
         self.mag_para = 6.5
         self.mag_perp = 6.5
         self.Ang_per_pix = 0.63
-        self.RED_CUTOFF = 5600
-        self.BLUE_CUTOFF = 3100
+        self.RED_CUTOFF = 5600.0
+        self.BLUE_CUTOFF = 3100.0
 
         self.pixel_size= 13.5
 

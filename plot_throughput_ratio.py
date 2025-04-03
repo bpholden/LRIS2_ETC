@@ -68,12 +68,14 @@ red_np_interp = np.interp(red2_waves, red_exp_calc.instrument.throughput['wavele
 blue_np_interp = np.interp(blue2_waves, blue_exp_calc.instrument.throughput['wavelength'],\
                                        blue_exp_calc.instrument.throughput['throughput'])
 
+blue_good = blue2_waves < 5550
+red_good = red2_waves > 5700
 blue_rat = blue2_exp_calc.throughput_interp / blue_np_interp
 red_rat = red2_exp_calc.throughput_interp / red_np_interp
-plt.plot(blue2_waves, blue_rat, 'b-', label='')
-plt.plot(red2_waves, red_rat, 'r-', label='')
+plt.plot(blue2_waves[blue_good], blue_rat[blue_good], 'b-', label='Ratio of B600 to 600/4000')
+plt.plot(red2_waves[red_good], red_rat[red_good], 'r-', label='Ratio of R400 to 400/8500')
 plt.xlabel(r'Wavelength ($\AA$)')
 plt.ylabel('Throughput Ratio')
 #plt.legend()
-plt.ylim(0, 3)
+plt.ylim(1, 3)
 plt.show()

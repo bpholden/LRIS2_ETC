@@ -27,6 +27,8 @@ def parse_args():
     parser.add_argument('--mag', '-m', type=float, default=22, help='filter magnitude')
     parser.add_argument('--filter', '-f', type=str, default='sdss_rprime.dat', help='filter')
     parser.add_argument('--flux_plots', action='store_true', help='make flux plots')
+    parser.add_argument('--per_pix','-p', action='store_true', help='use per pixel flux')
+    parser.add_argument('--per_resolution', '-P', action='store_true', help='use per resolution element flux')
     parser.add_argument('--template', '-T', type=str, default='starb1_template.fits', help='template file')
     return parser.parse_args()
 
@@ -88,8 +90,8 @@ def main():
     bsky.spec *= args.time
     rsky.spec *= args.time
 
-    bsky.rescale(lrisblue)
-    rsky.rescale(lrisred)
+    bsky.rescale(lrisblue, per_pix=args.per_pix)
+    rsky.rescale(lrisred, per_pix=args.per_pix)
 
     if args.flux_plots:
         plt.plot(waves, flux, 'k-')
@@ -108,12 +110,19 @@ def main():
     flux = photons(waves, flux)
     flux = compute_extinction(waves, flux, airmass=args.airmass)
 
-    flux[waves <= DICHROIC] *= lrisblue.Ang_per_pix
-    flux[waves > DICHROIC] *= lrisred.Ang_per_pix
+    if args.per_pix or args.per_resolution:
+        flux[waves <= DICHROIC] *= lrisblue.Ang_per_pix
+        flux[waves > DICHROIC] *= lrisred.Ang_per_pix
 
     red_npix = int(args.seeing / lrisred.scale_perp)
     blue_npix = int(args.seeing / lrisblue.scale_perp)
 
+    if args.per_resolution:
+        flux[waves <= DICHROIC] *= blue_npix
+        flux[waves > DICHROIC] *= red_npix
+        bsky.spec *= blue_npix
+        rsky.spec *= red_npix
+        
     in_band = (waves > BLUE_CUTOFF) & (waves < RED_CUTOFF)
     rsky_red_band = (rsky.wave > DICHROIC) & (rsky.wave < RED_CUTOFF)
     bsky_blue_band = (bsky.wave > BLUE_CUTOFF) & (bsky.wave <= DICHROIC)

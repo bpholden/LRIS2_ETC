@@ -29,15 +29,16 @@ class Sky:
         return pix, wave, spec
 
 
-    def rescale(self, instrument):
+    def rescale(self, instrument, per_pix=True):
 
         #instrument.Ang_per_pix *= instrument.pixel_size # dwave is for a 1" slit
         #sq_arcsec = instrument.swidth * instrument.sheight
         sq_arcsec = instrument.swidth #* instrument.scale_perp
         self.spec *= sq_arcsec
         # this should be e-/s/Ang
-        #spec *= instrument.Ang_per_pix
-        # this should be e-/pix/s
+        if per_pix:
+            self.spec *= instrument.Ang_per_pix
+            # this should be e-/pix/s
 
         return
 

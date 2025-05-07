@@ -84,8 +84,16 @@ class ExpCalc():
         """
         read_template(self)
         """
-        filen = 'data/templates'
-        filen = os.path.join(filen, self.template_filename)
+        dirn = 'data/templates'
+        template_list = os.listdir(dirn)
+        for template_name in template_list:
+            if self.template_filename in template_name:
+                self.template_filename = template_name
+                break
+        if self.template_filename == '':
+            print('No template found')
+            return
+        filen = os.path.join(dirn, self.template_filename)
         hdus = fits.open(filen)
         dat = hdus[1].data
 

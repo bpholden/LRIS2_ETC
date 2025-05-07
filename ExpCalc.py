@@ -21,7 +21,7 @@ class ExpCalc():
         self.seeing = seeing
         self.filter = mfilter
         self.redshift = redshift
-        self.template_filename = f"{template_filename}_template.fits"
+        self.template_filename = template_filename
         self.app_mag = app_mag
 
         self.mag = None

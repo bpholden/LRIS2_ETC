@@ -29,7 +29,11 @@ class Mag:
         wavelength (should be in the Angstroms)
         weight (the weight of the filter at that wavelength)
         '''
-        self.fn = fn
+        files = os.listdir(self.filter_dir)
+        for filename in files:
+            if fn in filename:
+                fn = filename
+                break
         fn = os.path.join(self.filter_dir, fn)
         data = astropy.io.ascii.read(fn)
         self.wave = data['col1']

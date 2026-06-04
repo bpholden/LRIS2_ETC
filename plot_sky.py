@@ -18,17 +18,17 @@ lr2_s = Sky.Sky()
 
 plt.plot(lr_s.wave, lr_s.spec)
 plt.plot(lr2_s.wave, lr2_s.spec)
-plt.xlim(5650,5825)
+plt.xlim(5800,5950)
 plt.ylim(0, 1)
 plt.show()
 
-lr_s.spec = Sky.rescale(lris_red, lr_s.spec)
-lr2_s.spec = Sky.rescale(lris2_red, lr2_s.spec)
+lr_s.rescale(lris_red)
+lr2_s.rescale(lris2_red)
 
 
 plt.plot(lr_s.wave, lr_s.spec)
 plt.plot(lr2_s.wave, lr2_s.spec)
-plt.xlim(5650,5825)
+plt.xlim(5800,5950)
 plt.ylim(0, 3)
 plt.show()
 

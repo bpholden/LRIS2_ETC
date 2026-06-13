@@ -91,8 +91,8 @@ def moffat_snr_optimal(flux, size, beta=3, width=0.75, height=8., pix_size=0.15)
     moffat_mod_eval = moffat_profile(xs, ys)
     background_mod_eval = background_mod(xs, ys)
 
-    profile = numpy.trapz(moffat_mod_eval, axis=1)
-    background_profile = numpy.trapz(background_mod_eval, axis=1)
+    profile = numpy.trapezoid(moffat_mod_eval, axis=1)
+    background_profile = numpy.trapezoid(background_mod_eval, axis=1)
 
     weighted_spectrum = flux*profile*profile  / background_profile
     weighted_noise = profile*profile / background_profile

@@ -48,8 +48,8 @@ class Mag:
         of the input filter file, but the units should
         be Angstroms
         '''
-        wv= numpy.trapz(self.wave, self.wave * self.weight)
-        wv = wv / numpy.trapz(self.wave, self.weight)
+        wv= numpy.trapezoid(self.wave * self.weight, x=self.wave)
+        wv = wv / numpy.trapezoid(self.weight, x=self.wave)
         return wv
 
     def compute_ABmag(self, spec_wave, spec):
@@ -60,8 +60,8 @@ class Mag:
         spec is in ergs/s/cm^2/Angstrom
         '''
         weights_interp = numpy.interp(spec_wave, self.wave, self.weight)
-        tot_filt = numpy.trapz(spec_wave, weights_interp)
-        tot_flux = numpy.trapz(spec_wave, weights_interp * spec)
+        tot_filt = numpy.trapezoid( weights_interp, spec_wave)
+        tot_flux = numpy.trapezoid( weights_interp * spec, x=spec_wave)
         tot_flux = tot_flux / tot_filt
         tot_flux = tot_flux / astropy.constants.c.value
         tot_flux = tot_flux * 1e-10 # convert c to Angstroms

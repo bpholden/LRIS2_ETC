@@ -6,7 +6,7 @@ class Sky:
 
     def __init__(self):
 
-        self.sky_dir = 'data/sky'
+        self.sky_dir = os.path.join(os.environ['HOME'],'src/LRIS2_ETC','data/sky')
         #self.bfn = os.path.join(self.sky_dir,'bsky.eps_pang_parcsec.fits')
         #self.rfn = os.path.join(self.sky_dir,'rsky.eps_pang_parcsec_onemicron.fits')
         self.fn = os.path.join(self.sky_dir,'sky.eps_pang_parcsec_onemicron.fits')

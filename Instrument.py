@@ -224,4 +224,3 @@ class Instrument:
         ## Wavelength range
         self.RED_CUTOFF = 10000
         self.BLUE_CUTOFF = 4000
-        # dei.throughput

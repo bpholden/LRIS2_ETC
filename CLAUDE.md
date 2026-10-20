@@ -8,7 +8,7 @@ There is no package, build, test suite or requirements file. The modules are fla
 
 ```sh
 python run_lris2.py                      # LRIS-2 blue+red SNR plot, defaults: r'=22, 1200 s, starb1
-python run_lris2.py -m 20 -t 600 -z 0.5 -T elliptical --red_grism R700 --blue_grism B1200
+python run_lris2.py -m 20 -t 600 -z 0.5 -T elliptical --red_grism R725p2 --blue_grism B1250p2
 python run_lris2.py --flux_plots         # also show intermediate flux plots at each pipeline stage
 python compare_old_new.py                # LRIS-2 vs. LRIS SNR / flux / sky
 python plot_throughput_ratio.py          # LRIS-2 vs. LRIS throughput and their ratio
@@ -30,7 +30,7 @@ Dependencies: numpy ≥ 2.0 (code uses `numpy.trapezoid`, not `trapz`), astropy,
 
   Results land in attributes over `waves[in_band]`: `signal`, `sky_flux`, `noise` (σ), `snr`, all per pixel or per Å as requested. `flux` remains the full-grid source spectrum in photons/Å. The scripts expose the option as `--per_angstrom`/`-A`.
 - [Instrument.py](Instrument.py): `Instrument` is a parameter bag. Its configurator methods each take a `Telescope`:
-  - `lris2_red` (R400/R700/R750) and `lris2_blue` (B600/B1200/B1300) for LRIS-2.
+  - `lris2_red` (R400/R725p1/R725p2) and `lris2_blue` (B600/B1250p1/B1250p2) for LRIS-2. The p1/p2 gratings each cover part of the arm, so they set narrower `BLUE_CUTOFF`/`RED_CUTOFF` values. Their old design names, which still appear in the PDR spreadsheets, were R750→R725p1, R700→R725p2, B1300→B1250p1 and B1200→B1250p2.
   - `lris_red` and `lris_blue` for the current LRIS.
   - `deimos`, which is incomplete: it sets no `name`, so `read_throughput` raises.
 
@@ -49,7 +49,16 @@ Dependencies: numpy ≥ 2.0 (code uses `numpy.trapezoid`, not `trapz`), astropy,
 
 - `data/templates/`: Kinney-Calzetti galaxy, QSO, SN Ia, PN and Pickles stellar templates (FITS tables).
 - `data/filters/`: SDSS u'g'r'i'z', LSST ugrizy and Bessell V. The LSST files have `#` header lines, which astropy skips.
-- `data/throughput/`: LRIS-2 total efficiency CSVs (`wavelength` in nm, `throughput`). The LRIS `sens_*.fits.gz` files exist locally but are **not tracked**, because `.gitignore` excludes `*.gz`. A fresh clone can't run `compare_old_new.py` or `plot_throughput_ratio.py` without them.
+- `data/throughput/`: all LRIS-2 curves have wavelength in nm.
+  - `<grating>_tot_eff.csv`: total efficiency (`wavelength`, `throughput`). This is what the code reads.
+  - Component curves split out of the PDR efficiency spreadsheets, to be replaced with measured values over time; not yet used by the code:
+    - `Keck1_telescope.csv`: TELE-M1, TELE-M2 and ADC, 310–1000 nm.
+    - `LRIS2_{blue,red}_common_path.csv`: Window, COLL-M1, COLL-M2, DICHROIC, FOLD and CAMERA.
+    - `<grating>_grating.csv`: `DE` (the grating efficiency at field centre, the PDR "DE (0')" column) and `PRISMS`.
+    - `STA5100_predicted_blue_qe.dat` and `STA4850_ID280_red_qe.dat`: detector QE.
+
+    These cover only 310–560 nm (blue) and 550–1000 nm (red). Multiplying them reproduces the PDR totals.
+  - The LRIS `sens_*.fits.gz` files exist locally but are **not tracked**, because `.gitignore` excludes `*.gz`. A fresh clone can't run `compare_old_new.py` or `plot_throughput_ratio.py` without them.
 
 ## Gotchas
 

@@ -53,7 +53,7 @@ Dependencies: numpy ≥ 2.0 (code uses `numpy.trapezoid`, not `trapz`), astropy,
   - `<grating>_tot_eff.csv`: the older total-efficiency curves (`wavelength`, `throughput`, including Keck). The code no longer reads them; they are kept for comparison.
   - Component curves split out of the PDR efficiency spreadsheets, to be replaced with measured values over time. The code multiplies these to get the LRIS-2 throughput:
     - `Keck1_telescope.csv`: TELE-M1, TELE-M2 and ADC, 310–1000 nm.
-    - `LRIS2_{blue,red}_common_path.csv`: Window, COLL-M1, COLL-M2, DICHROIC, FOLD and CAMERA. The blue file runs to 570 nm. Rows 561–570 were added by hand: there DICHROIC = 1 − (red DICHROIC), since in the 550–560 nm overlap the two sum to 1.000 within 0.002, and the other columns repeat their 560 nm values.
+    - `LRIS2_{blue,red}_common_path.csv`: Window, COLL-M1, COLL-M2, DICHROIC, FOLD and CAMERA. The blue file runs to 570 nm. Rows 561–570 were added by hand: there DICHROIC = 1 − (red DICHROIC), since in the 550–560 nm overlap the two sum to 1.000 within 0.002, Window, COLL-M1 and COLL-M2 are taken from the red file, since the two arms agree exactly from 550 to 560 nm. FOLD and CAMERA repeat their 560 nm values.
     - `<grating>_grating.csv`: `DE` (the grating efficiency at field centre, the PDR "DE (0')" column) and `PRISMS`.
     - `STA5100_predicted_blue_qe.dat` and `STA4850_ID280_red_qe.dat`: detector QE.
 

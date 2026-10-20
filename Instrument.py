@@ -244,7 +244,7 @@ class Instrument:
         '''
 
         self.name = "LRISb"
-        if grating not in ("600_4000_D560"):
+        if grating not in ("600_4000_D560",):
             raise ValueError(f"Grating {grating} not supported for {self.name}")
 
         self.grating = grating

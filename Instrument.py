@@ -1,6 +1,31 @@
 """Instrument class for the snr calculator"""
 import os
+import numpy as np
 import astropy.io.ascii
+from scipy.interpolate import CubicSpline
+
+
+def spline_efficiency(wave, eff, new_wave):
+    '''
+    spline_efficiency(wave, eff, new_wave)
+
+    Evaluates an efficiency curve at new_wave with a cubic spline.
+    Beyond the ends of the data, the curve is continued linearly from
+    the spline's end value and slope, since extrapolating the cubic itself
+    diverges quickly (e.g. on the steep dichroic edge). The result is
+    clipped to the physical range [0, 1].
+    '''
+    spline = CubicSpline(wave, eff, extrapolate=False)
+    slope = spline.derivative()
+    new_eff = spline(new_wave)
+
+    below = new_wave < wave[0]
+    new_eff[below] = eff[0] + slope(wave[0])*(new_wave[below] - wave[0])
+    above = new_wave > wave[-1]
+    new_eff[above] = eff[-1] + slope(wave[-1])*(new_wave[above] - wave[-1])
+
+    return np.clip(new_eff, 0.0, 1.0)
+
 
 class Instrument:
     """
@@ -27,6 +52,10 @@ class Instrument:
         self.wvmnx= [] #
         self.dely= 0.0
         self.throughput = None
+        self.throughput_components = None
+        self.telescope = None
+        self.common_path_file = None # efficiency files, wavelengths in nm
+        self.detector_qe_file = None
         self.BLUE_CUTOFF = 0
         self.RED_CUTOFF = 1e6
         self.throughput_dir = 'data/throughput'
@@ -48,13 +77,48 @@ class Instrument:
         self.throughput['wavelength'] = hdus[2].data['WAV'][0]
         self.throughput['throughput'] = hdus[2].data['EFF'][0]
 
+    def read_efficiency_file(self, short_name, wave):
+        '''
+        read_efficiency_file(self, short_name, wave)
+
+        Reads an efficiency file whose first column is wavelength in nm
+        and whose remaining columns are efficiencies of subcomponents.
+        Returns a dict of each column evaluated at wave (Angstroms).
+        '''
+        data = astropy.io.ascii.read(os.path.join(self.throughput_dir, short_name))
+        file_wave = np.array(data.columns[0], dtype=float) * 10 # nm to Angstroms
+        components = {}
+        for col in data.colnames[1:]:
+            components[col] = spline_efficiency(file_wave, np.array(data[col], dtype=float), wave)
+        return components
+
     def read_lris2_throughput(self):
         '''
         read_lris2_throughput(self)
+
+        Computes the total efficiency between the cutoffs as the product of
+        the grating, the common path for this arm, the detector QE and,
+        if the telescope has one, the telescope efficiency.
         '''
-        grating_filename = os.path.join(self.throughput_dir, self.grating + "_tot_eff.csv")
-        self.throughput = astropy.io.ascii.read(grating_filename)
-        self.throughput['wavelength'] *= 10 # we work in Angstroms but these tables are in nm
+        nsamp = int(round((self.RED_CUTOFF - self.BLUE_CUTOFF) / 10.)) + 1
+        wave = np.linspace(self.BLUE_CUTOFF, self.RED_CUTOFF, nsamp) # 1 nm sampling
+
+        files = [self.grating + "_grating.csv", self.common_path_file, self.detector_qe_file]
+        if self.telescope is not None and self.telescope.throughput_file:
+            files.append(self.telescope.throughput_file)
+
+        self.throughput_components = {}
+        for short_name in files:
+            components = self.read_efficiency_file(short_name, wave)
+            if short_name == self.detector_qe_file:
+                components = {'DETECTOR': next(iter(components.values()))}
+            self.throughput_components.update(components)
+
+        total = np.ones_like(wave)
+        for eff in self.throughput_components.values():
+            total *= eff
+
+        self.throughput = {'wavelength': wave, 'throughput': total}
 
     def read_throughput(self):
         '''
@@ -83,6 +147,9 @@ class Instrument:
             raise ValueError(f"Grating {grating} not supported for {self.name}")
 
         self.grating = grating
+        self.telescope = tel
+        self.common_path_file = "LRIS2_red_common_path.csv"
+        self.detector_qe_file = "STA4850_ID280_red_qe.dat"
         self.sheight = 8
         self.swidth = 0.7
         self.dark = 0.065/3600.
@@ -118,6 +185,9 @@ class Instrument:
             raise ValueError(f"Grating {grating} not supported for {self.name}")
 
         self.grating = grating
+        self.telescope = tel
+        self.common_path_file = "LRIS2_blue_common_path.csv"
+        self.detector_qe_file = "STA5100_predicted_blue_qe.dat"
         self.sheight = 8
         self.swidth = 0.7
         self.dark = 0.77/3600.

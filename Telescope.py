@@ -6,6 +6,7 @@ class Telescope(object):
         self.name = '' # KeckI, KeckII, Lick-3m
         self.area= 0.
         self.plate_scale= 0.
+        self.throughput_file = None # mirrors + ADC efficiency, in data/throughput
         if name:
             if name.lower() == 'keck1':
                 self.keckone()
@@ -31,6 +32,7 @@ class Telescope(object):
     def keckone(self):
         self.keck()
         self.name = 'KeckI'
+        self.throughput_file = 'Keck1_telescope.csv'
 
 
     def kecktwo(self):

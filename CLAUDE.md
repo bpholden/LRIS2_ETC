@@ -35,7 +35,7 @@ Dependencies: numpy ≥ 2.0 (code uses `numpy.trapezoid`, not `trapz`), astropy,
   - `deimos`, which is incomplete: it sets no `name`, so `read_throughput` raises.
 
   Each configurator sets the band cutoffs (`BLUE_CUTOFF`/`RED_CUTOFF`, in Å), the pixel scale, read noise and dark current. `read_throughput` dispatches on `name`:
-  - LRIS-2 reads `data/throughput/<grating>_tot_eff.csv`, which is in **nm** and converted to Å on load.
+  - LRIS-2 (`read_lris2_throughput`) builds the total efficiency on a 1 nm grid from `BLUE_CUTOFF` to `RED_CUTOFF`. It multiplies the grating file `<grating>_grating.csv`, the arm's `common_path_file` and `detector_qe_file` (set in `lris2_red`/`lris2_blue`), and the telescope's `throughput_file` (set for Keck I only). The individual curves are kept in `throughput_components`. Each curve goes through `spline_efficiency`: a cubic spline inside the data, continued linearly from the spline's end slope beyond it, and clipped to [0, 1]. To use a measured curve, point the matching attribute at the new file.
   - LRIS and DEIMOS read XIDL `sens_<name>_<grating>.fits.gz` files.
 - [Telescope.py](Telescope.py): collecting area (cm²) and plate scale ("/mm). Build it with `Telescope(name='keck1')`, or with `Telescope()` and then `.keckone()`.
 - [Mag.py](Mag.py): reads a 2-column filter curve (Å, weight) from `data/filters/`, computes λ_eff and the AB magnitude of a spectrum.
@@ -50,14 +50,14 @@ Dependencies: numpy ≥ 2.0 (code uses `numpy.trapezoid`, not `trapz`), astropy,
 - `data/templates/`: Kinney-Calzetti galaxy, QSO, SN Ia, PN and Pickles stellar templates (FITS tables).
 - `data/filters/`: SDSS u'g'r'i'z', LSST ugrizy and Bessell V. The LSST files have `#` header lines, which astropy skips.
 - `data/throughput/`: all LRIS-2 curves have wavelength in nm.
-  - `<grating>_tot_eff.csv`: total efficiency (`wavelength`, `throughput`). This is what the code reads.
-  - Component curves split out of the PDR efficiency spreadsheets, to be replaced with measured values over time; not yet used by the code:
+  - `<grating>_tot_eff.csv`: the older total-efficiency curves (`wavelength`, `throughput`, including Keck). The code no longer reads them; they are kept for comparison.
+  - Component curves split out of the PDR efficiency spreadsheets, to be replaced with measured values over time. The code multiplies these to get the LRIS-2 throughput:
     - `Keck1_telescope.csv`: TELE-M1, TELE-M2 and ADC, 310–1000 nm.
-    - `LRIS2_{blue,red}_common_path.csv`: Window, COLL-M1, COLL-M2, DICHROIC, FOLD and CAMERA.
+    - `LRIS2_{blue,red}_common_path.csv`: Window, COLL-M1, COLL-M2, DICHROIC, FOLD and CAMERA. The blue file runs to 570 nm. Rows 561–570 were added by hand: there DICHROIC = 1 − (red DICHROIC), since in the 550–560 nm overlap the two sum to 1.000 within 0.002, and the other columns repeat their 560 nm values.
     - `<grating>_grating.csv`: `DE` (the grating efficiency at field centre, the PDR "DE (0')" column) and `PRISMS`.
     - `STA5100_predicted_blue_qe.dat` and `STA4850_ID280_red_qe.dat`: detector QE.
 
-    These cover only 310–560 nm (blue) and 550–1000 nm (red). Multiplying them reproduces the PDR totals.
+    These cover only 310–560 nm (blue) and 550–1000 nm (red), so cutoffs outside that range rely on extrapolation: B1250p1 starts at 307 nm, and the B600 and B1250p2 grating DE curves stop at 560 nm while those cutoffs run to 570 nm. Multiplying them reproduces the PDR totals.
   - The LRIS `sens_*.fits.gz` files exist locally but are **not tracked**, because `.gitignore` excludes `*.gz`. A fresh clone can't run `compare_old_new.py` or `plot_throughput_ratio.py` without them.
 
 ## Gotchas

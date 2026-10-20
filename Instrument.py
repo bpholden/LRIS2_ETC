@@ -79,7 +79,7 @@ class Instrument:
         unless otherwise specified.
         '''
         self.name = "LRIS-2 Red"
-        if grating not in ("R400", "R700", "R750"):
+        if grating not in ("R400", "R725p1", "R725p2"):
             raise ValueError(f"Grating {grating} not supported for {self.name}")
 
         self.grating = grating
@@ -94,6 +94,12 @@ class Instrument:
         self.Ang_per_pix = 1.13 #
         self.BLUE_CUTOFF = 5500.0
         self.RED_CUTOFF = 9500.0
+        if grating == 'R725p1':
+            self.BLUE_CUTOFF = 5500.0
+            self.RED_CUTOFF = 7880.0
+        elif grating == 'R725p2':
+            self.BLUE_CUTOFF = 7650.0
+            self.RED_CUTOFF = 9500.0
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
         self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
@@ -108,7 +114,7 @@ class Instrument:
         '''
         self.name = "LRIS-2 Blue"
 
-        if grating not in ("B600", "B1200", "B1300"):
+        if grating not in ("B600", "B1250p1", "B1250p2"):
             raise ValueError(f"Grating {grating} not supported for {self.name}")
 
         self.grating = grating
@@ -123,6 +129,12 @@ class Instrument:
         self.Ang_per_pix = 0.62 #
         self.RED_CUTOFF = 5700.0
         self.BLUE_CUTOFF = 3100.0
+        if grating == 'B1250p1':
+            self.BLUE_CUTOFF = 3070.0
+            self.RED_CUTOFF = 4390.0
+        elif grating == 'B1250p2':
+            self.BLUE_CUTOFF = 4300.0
+            self.RED_CUTOFF = 5700.0
 
         self.pixel_size= 15 # 15.0 microns is 0.15 "
         self.scale_perp = tel.plate_scale*self.mag_perp*(self.pixel_size/1000.) # Arcsec
@@ -212,4 +224,3 @@ class Instrument:
         ## Wavelength range
         self.RED_CUTOFF = 10000
         self.BLUE_CUTOFF = 4000
-        # dei.throughput

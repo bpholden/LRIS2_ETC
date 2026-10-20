@@ -30,10 +30,10 @@ def make_1d_mod(size, beta, amp=1):
     '''
     moffat_size = size / numpy.sqrt(2**(1/beta) - 1)
     moffat_size /= 2
-    print(f"size scale = {moffat_size:0.3f}")
+    #print(f"size scale = {moffat_size:0.3f}")
     amp_norm = (beta - 1)/  (numpy.pi*moffat_size **2)
     amp *= amp_norm
-    print(f"scale of amp = {amp_norm:0.4f}")
+    #print(f"scale of amp = {amp_norm:0.4f}")
     moffat_mod = astropy.modeling.functional_models.Moffat1D(amplitude=amp,
                                                          gamma=moffat_size, alpha=beta)
 
@@ -118,4 +118,3 @@ def moffat_frac(size, width, height, beta=3, pix_size=0.15):
     moffat_mod_eval = moffat_profile(xs, ys)
     frac = numpy.sum(moffat_mod_eval)
     return frac
-  

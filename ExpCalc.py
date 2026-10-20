@@ -31,8 +31,10 @@ class ExpCalc():
         self.waves = None
         self.good_waves = None
         self.throughput_interp = None
+        self.signal = None
         self.noise = None
         self.snr = None
+        self.per_angstrom = False
         self.sky_flux = None
         self.in_band = None
         self.flux_plots = False
@@ -102,10 +104,17 @@ class ExpCalc():
         self.waves *= (1 + self.redshift)
         return
 
-    def compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None):
+    def compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None,
+                         per_angstrom=False):
         '''
-        compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None)
+        compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None,
+                         per_angstrom=False)
+
+        Computes the signal, noise and SNR per dispersion pixel, summed over
+        the spatial pixels along the slit. If per_angstrom is True, these are
+        then converted to per Angstrom using the Angstroms per pixel.
         '''
+        self.per_angstrom = per_angstrom
 
         if telescope:
             self.telescope = telescope
@@ -125,7 +134,7 @@ class ExpCalc():
         self.flux *= frac
         self.sky.spec *= time
 
-        self.sky.rescale(self.instrument)
+        self.sky.rescale(self.instrument, per_pix=False) # e-/Ang/arcsec along the slit
         self.flux = self.flux * self.telescope.area
 
         if self.flux_plots:
@@ -136,7 +145,6 @@ class ExpCalc():
             plt.title(f'Flux {self.instrument.name}')
             plt.show()
 
-        #self.flux *= self.instrument.Ang_per_pix
         self.photons()
         if self.flux_plots:
             plt.plot(self.waves, self.flux, 'k-')
@@ -153,7 +161,8 @@ class ExpCalc():
             plt.title(f'Photons after throughput and extinction {self.instrument.name}')
             plt.show()
 
-        npix = int(slit_length )
+        # number of spatial pixels along the slit (slit_length is in arcsec)
+        npix = int(round(slit_length / (self.instrument.scale_perp * self.instrument.bins)))
         if npix < 2:
             npix = 2
 
@@ -168,12 +177,24 @@ class ExpCalc():
 
         self.sky_flux = self.scale_sky_by_throughput(self.waves[self.in_band], self.sky_flux)
 
-        self.noise = self.flux[self.in_band]
-        self.noise += self.sky_flux
-        self.noise += npix*self.instrument.dark*time
-        self.noise += npix*self.instrument.readnoise**2
+        # source and sky are per Angstrom, convert to per (binned) dispersion pixel
+        ang_per_pix = self.instrument.Ang_per_pix * self.instrument.bind
+        self.signal = self.flux[self.in_band] * ang_per_pix
+        self.sky_flux *= ang_per_pix
 
-        self.snr = np.zeros_like(self.waves[self.in_band])
-        self.snr = self.flux[self.in_band]/np.sqrt(self.noise)
+        # variance per dispersion pixel; dark and read noise come from npix spatial pixels
+        variance = self.signal + self.sky_flux
+        variance += npix*self.instrument.dark*time
+        variance += npix*self.instrument.readnoise**2
 
-        return 
+        if per_angstrom:
+            # a 1 Angstrom bin holds 1/ang_per_pix pixels: signal and variance both
+            # sum over them, so the SNR scales by 1/sqrt(ang_per_pix)
+            self.signal /= ang_per_pix
+            self.sky_flux /= ang_per_pix
+            variance /= ang_per_pix
+
+        self.noise = np.sqrt(variance)
+        self.snr = self.signal/self.noise
+
+        return

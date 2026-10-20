@@ -26,7 +26,7 @@ bfn = 'bsky.eps_pang_parcsec.fits'
 rfn = 'rsky.eps_pang_parcsec_onemicron.fits'
 
 bpix, bwave, bspec, bda = read_file(bfn)
-rpix, rwave, rspec, rda = read_file(bfn)
+rpix, rwave, rspec, rda = read_file(rfn)
 
 blue_max = bwave.max()
 red_min = rwave.min()

@@ -10,7 +10,7 @@ class Instrument:
         self.name = ""
         self.sheight = 0.0 # Slit height
         self.swidth = 0.0 # Slit width
-        self.dark = 0.0 # dark current
+        self.dark = 0.0 # dark current (e-/pix/s)
         self.readnoise = 0.0 # read noise
         self.bind = 1 # dispersion binning
         self.bins = 1 # spatial binning
@@ -85,7 +85,7 @@ class Instrument:
         self.grating = grating
         self.sheight = 8
         self.swidth = 0.7
-        self.dark = 0.001
+        self.dark = 0.065/3600.
         self.readnoise = 3.5
         self.bind = 1
         self.bins = 1
@@ -114,7 +114,7 @@ class Instrument:
         self.grating = grating
         self.sheight = 8
         self.swidth = 0.7
-        self.dark = 0.001
+        self.dark = 0.077/3600.
         self.readnoise = 3.5
         self.bind = 1
         self.bins = 1
@@ -139,7 +139,7 @@ class Instrument:
         self.grating = grating
         self.sheight = 8
         self.swidth = 1.2
-        self.dark = 0.001
+        self.dark = 4./3600.  # electrons/pix/s
         self.readnoise = 4.5
         self.bind = 1
         self.bins = 1
@@ -168,7 +168,7 @@ class Instrument:
         self.grating = grating
         self.sheight = 8
         self.swidth = 1.2
-        self.dark = 0.001
+        self.dark = 4/3600.
         self.readnoise = 3.7
         self.bind = 1
         self.bins = 1
@@ -205,7 +205,7 @@ class Instrument:
 
         ## Detector
         self.readnoise = 2.6
-        self.dark = 0.001  # electrons/pix/hr
+        self.dark = 3.5/3600.  # electrons/pix/s
         self.bind = 1
         self.bins = 1
 

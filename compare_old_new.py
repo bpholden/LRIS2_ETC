@@ -26,6 +26,8 @@ def parse_args():
     parser.add_argument('--template', '-T', type=str, default='starb1', \
                         help='Template file (starb1)')
     parser.add_argument('--flux_plots', action='store_true', help='make flux plots')
+    parser.add_argument('--per_angstrom', '-A', action='store_true', \
+                        help='signal and noise per Angstrom instead of per pixel')
     return parser.parse_args()
 
 def main():
@@ -60,14 +62,15 @@ def main():
         red_exp_calc.flux_plots = True
 
     blue2_exp_calc.compute_spectrum(args.time, args.slit_length,\
-                                                args.slit_width)
+                                                args.slit_width, per_angstrom=args.per_angstrom)
     red2_exp_calc.compute_spectrum(args.time, args.slit_length, \
-                                                args.slit_width)
+                                                args.slit_width, per_angstrom=args.per_angstrom)
     blue_exp_calc.compute_spectrum(args.time, args.slit_length,\
-                                                args.slit_width)
+                                                args.slit_width, per_angstrom=args.per_angstrom)
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
-                                                args.slit_width)
+                                                args.slit_width, per_angstrom=args.per_angstrom)
 
+    unit = r'\AA^{-1}' if args.per_angstrom else r'pix^{-1}'
     _, ax = plt.subplots(3, 1, layout='constrained', figsize=(12, 6))
 
     ax[0].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.snr, 'b-', label='Blue2')
@@ -75,14 +78,14 @@ def main():
     ax[0].plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b--', label='Blue')
     ax[0].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.snr, 'r--', label='Red')
     ax[0].set_xlabel(r'Wavelength ($\AA$)')
-    ax[0].set_ylabel('SNR')
+    ax[0].set_ylabel('SNR per Angstrom' if args.per_angstrom else 'SNR per pixel')
 
-    ax[1].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.flux[blue2_exp_calc.in_band], 'b-', label='Blue2')
-    ax[1].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.flux[red2_exp_calc.in_band], 'r-', label='Red2')
-    ax[1].plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.flux[blue_exp_calc.in_band], 'b--', label='Blue')
-    ax[1].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.flux[red_exp_calc.in_band], 'r--', label='Red')
+    ax[1].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.signal, 'b-', label='Blue2')
+    ax[1].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.signal, 'r-', label='Red2')
+    ax[1].plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.signal, 'b--', label='Blue')
+    ax[1].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.signal, 'r--', label='Red')
     ax[1].set_xlabel(r'Wavelength ($\AA$)')
-    ax[1].set_ylabel(r'Photons ($\gamma\ \AA^{-1}$)')
+    ax[1].set_ylabel(rf'Photons ($\gamma\ {unit}$)')
     #ax[1].set_ylim(0, 1.5e3)
     ax[1].set_yscale('log')
 
@@ -91,7 +94,7 @@ def main():
     ax[2].plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.sky_flux, 'b--', label='Blue')
     ax[2].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.sky_flux, 'r--', label='Red')
     ax[2].set_xlabel(r'Wavelength ($\AA$)')
-    ax[2].set_ylabel(r'Sky Photons ($\gamma\ \AA^{-1}$)')
+    ax[2].set_ylabel(rf'Sky Photons ($\gamma\ {unit}$)')
     #ax[2].set_ylim(0, 1.5e3)
     ax[2].set_yscale('log')
 

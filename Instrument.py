@@ -114,7 +114,7 @@ class Instrument:
         self.grating = grating
         self.sheight = 8
         self.swidth = 0.7
-        self.dark = 0.077/3600.
+        self.dark = 0.77/3600.
         self.readnoise = 3.5
         self.bind = 1
         self.bins = 1

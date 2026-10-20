@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 
-import ExpCalc
-import Instrument
-import Telescope
-import Sky
+from lris2_etc import ExpCalc
+from lris2_etc import Instrument
+from lris2_etc import Telescope
+from lris2_etc import Sky
 
 keck_1 = Telescope.Telescope()
 keck_1.keckone()

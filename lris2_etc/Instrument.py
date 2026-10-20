@@ -4,6 +4,8 @@ import numpy as np
 import astropy.io.ascii
 from scipy.interpolate import CubicSpline
 
+from . import DATA_DIR
+
 
 def spline_efficiency(wave, eff, new_wave):
     '''
@@ -58,7 +60,7 @@ class Instrument:
         self.detector_qe_file = None
         self.BLUE_CUTOFF = 0
         self.RED_CUTOFF = 1e6
-        self.throughput_dir = 'data/throughput'
+        self.throughput_dir = os.path.join(DATA_DIR, 'throughput')
 
     def __repr__(self):
         return f'<Instrument {self.name} {self.grating}>'

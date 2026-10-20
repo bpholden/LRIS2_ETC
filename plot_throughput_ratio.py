@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import ExpCalc
-import Instrument
-import Telescope
+from lris2_etc import ExpCalc
+from lris2_etc import Instrument
+from lris2_etc import Telescope
 
 
 keck_1 = Telescope.Telescope()

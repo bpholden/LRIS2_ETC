@@ -2,9 +2,9 @@ import argparse
 
 import matplotlib.pyplot as plt
 
-import ExpCalc
-import Instrument
-import Telescope
+from . import ExpCalc
+from . import Instrument
+from . import Telescope
 
 
 def parse_args():

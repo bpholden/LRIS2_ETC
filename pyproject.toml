@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lris2_etc"
+version = "0.1.0"
+description = "Exposure time calculator for LRIS-2, the successor to LRIS on Keck I"
+readme = "README.md"
+authors = [{ name = "Bradford Holden" }]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=2.0",
+    "scipy",
+    "astropy",
+    "matplotlib",
+]
+
+[project.scripts]
+lris2-etc = "lris2_etc.run_lris2:main"
+lris2-compare = "lris2_etc.compare_old_new:main"
+
+[tool.setuptools]
+packages = ["lris2_etc"]
+
+[tool.setuptools.package-data]
+lris2_etc = [
+    "data/filters/*",
+    "data/sky/*.fits",
+    "data/templates/*.fits",
+    "data/throughput/*",
+]

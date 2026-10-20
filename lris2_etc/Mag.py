@@ -3,6 +3,8 @@ import numpy
 import astropy.constants
 import astropy.io.ascii
 
+from . import DATA_DIR
+
 class Mag:
     def __init__(self, fn=None):
         self.fn = fn
@@ -10,7 +12,7 @@ class Mag:
         self.weight = None
         self.lambda_eff = None
         self.mag = None
-        self.filter_dir = os.path.join('data', 'filters')
+        self.filter_dir = os.path.join(DATA_DIR, 'filters')
         if self.fn is not None:
             self.read_filter(fn)
             self.lambda_eff = self.compute_lambda_eff()

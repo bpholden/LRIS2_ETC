@@ -3,9 +3,9 @@ import argparse
 
 import matplotlib.pyplot as plt
 
-import ExpCalc
-import Instrument
-import Telescope
+from . import ExpCalc
+from . import Instrument
+from . import Telescope
 
 def parse_args():
     '''
@@ -32,10 +32,12 @@ def parse_args():
                         help='signal and noise per Angstrom instead of per pixel')
     return parser.parse_args()
 
-def main(args):
+def main(args=None):
     '''
     Run the exposure time calculator.
     '''
+    if args is None:
+        args = parse_args()
     keck_1 = Telescope.Telescope()
     keck_1.keckone()
     lris2_blue = Instrument.Instrument()
@@ -66,5 +68,4 @@ def main(args):
     plt.show()
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()

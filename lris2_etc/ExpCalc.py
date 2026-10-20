@@ -4,10 +4,11 @@ import astropy.constants
 import astropy.io.fits as fits
 import matplotlib.pyplot as plt
 
-import Sky
-import Mag
-import Transmission
-import Moffat
+from . import DATA_DIR
+from . import Sky
+from . import Mag
+from . import Transmission
+from . import Moffat
 
 class ExpCalc():
     """
@@ -86,7 +87,7 @@ class ExpCalc():
         """
         read_template(self)
         """
-        dirn = 'data/templates'
+        dirn = os.path.join(DATA_DIR, 'templates')
         template_list = os.listdir(dirn)
         for template_name in template_list:
             if self.template_filename in template_name:

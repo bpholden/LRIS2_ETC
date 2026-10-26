@@ -30,6 +30,8 @@ def parse_args():
     parser.add_argument('--flux_plots', action='store_true', help='make flux plots')
     parser.add_argument('--per_angstrom', '-A', action='store_true', \
                         help='signal and noise per Angstrom instead of per pixel')
+    parser.add_argument('--aperture', '-x', type=float, default=None, \
+                        help='extraction length in units of the seeing FWHM (full slit)')
     return parser.parse_args()
 
 def main(args=None):
@@ -55,9 +57,11 @@ def main(args=None):
         red_exp_calc.flux_plots = True
 
     blue_exp_calc.compute_spectrum(args.time, args.slit_length,\
-                                                          args.slit_width, per_angstrom=args.per_angstrom)
+                                                          args.slit_width, per_angstrom=args.per_angstrom,
+                                                          aperture=args.aperture)
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
-                                                      args.slit_width, per_angstrom=args.per_angstrom)
+                                                      args.slit_width, per_angstrom=args.per_angstrom,
+                                                      aperture=args.aperture)
 
     _, _ = plt.subplots(figsize=(12, 6))
     plt.plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b-', label='Blue')

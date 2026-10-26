@@ -106,14 +106,16 @@ class ExpCalc():
         return
 
     def compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None,
-                         per_angstrom=False):
+                         per_angstrom=False, aperture=None):
         '''
         compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None,
-                         per_angstrom=False)
+                         per_angstrom=False, aperture=None)
 
         Computes the signal, noise and SNR per dispersion pixel, summed over
-        the spatial pixels along the slit. If per_angstrom is True, these are
-        then converted to per Angstrom using the Angstroms per pixel.
+        the spatial pixels along the slit. If aperture is given, the sum is
+        instead over an extraction length of aperture x seeing FWHM, capped at
+        the slit length. If per_angstrom is True, these are then converted to
+        per Angstrom using the Angstroms per pixel.
         '''
         self.per_angstrom = per_angstrom
 
@@ -123,8 +125,11 @@ class ExpCalc():
             self.instrument = inst
         self.instrument.sheight = slit_length
         self.instrument.swidth = slit_width
-        frac = Moffat.moffat_frac(self.seeing, slit_width, slit_length, \
-                                  pix_size=self.instrument.scale_perp)
+        # length along the slit that is summed into the spectrum (arcsec)
+        extract_length = slit_length
+        if aperture:
+            extract_length = min(aperture*self.seeing, slit_length)
+        frac = Moffat.moffat_frac(self.seeing, slit_width, extract_length)
 
         self.mag = Mag.Mag(self.filter)
         self.read_template()
@@ -162,8 +167,8 @@ class ExpCalc():
             plt.title(f'Photons after throughput and extinction {self.instrument.name}')
             plt.show()
 
-        # number of spatial pixels along the slit (slit_length is in arcsec)
-        npix = int(round(slit_length / (self.instrument.scale_perp * self.instrument.bins)))
+        # number of spatial pixels in the extraction (extract_length is in arcsec)
+        npix = int(round(extract_length / (self.instrument.scale_perp * self.instrument.bins)))
         if npix < 2:
             npix = 2
 
@@ -174,7 +179,7 @@ class ExpCalc():
 
         self.sky_flux = np.interp(self.waves[self.in_band], self.sky.wave[sky_band], \
                                   self.sky.spec[sky_band])
-        self.sky_flux *= slit_length
+        self.sky_flux *= extract_length
 
         self.sky_flux = self.scale_sky_by_throughput(self.waves[self.in_band], self.sky_flux)
 

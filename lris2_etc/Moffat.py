@@ -105,16 +105,14 @@ def moffat_snr_optimal(flux, size, beta=3, width=0.75, height=8., pix_size=0.15)
     snr = source / numpy.sqrt(var)
     return snr
 
-def moffat_frac(size, width, height, beta=3, pix_size=0.15):
+def moffat_frac(size, width, height, beta=3):
     '''
-    moffat_frac
-    '''
-    xs, ys, sc_size = prep_values(size, height, pix_size)
-    width /= pix_size
-    height /= pix_size
+    moffat_frac(size, width, height, beta=3)
 
-    slit = astropy.modeling.functional_models.Box2D(1, x_width=width, y_width=height)
-    moffat_profile = make_2d_mod(sc_size, beta, 1)*slit
-    moffat_mod_eval = moffat_profile(xs, ys)
-    frac = numpy.sum(moffat_mod_eval)
+    Fraction of a Moffat PSF with FWHM size inside a centred box of
+    width x height, all in arcsec, by direct 2D integration.
+    '''
+    moffat_mod = make_2d_mod(size, beta, 1)
+    frac, _ = integrate.dblquad(lambda y, x: moffat_mod(x, y),
+                                -width/2, width/2, -height/2, height/2)
     return frac

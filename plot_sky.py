@@ -16,8 +16,8 @@ lr_s = Sky.Sky()
 lr2_s = Sky.Sky()
 
 plt.plot(lr2_s.wave, lr2_s.spec)
-plt.xlim(8750,9000)
-plt.ylim(0, 25)
+plt.xlim(3200,9500)
+plt.ylim(0, 35)
 plt.show()
 
 plt.plot(lr_s.wave, lr_s.spec)

@@ -13,10 +13,11 @@ lris2-etc -m 20 -t 600 -z 0.5 -T elliptical --red_grism R725p2 --blue_grism B125
 lris2-etc --flux_plots                    # also show intermediate flux plots at each pipeline stage
 lris2-etc -x 1.5                          # extract 1.5 x seeing FWHM along the slit instead of the full slit
 lris2-compare                             # LRIS-2 vs. LRIS SNR / flux / sky
+lris2-moffat-beta 0.8 0.904               # Moffat beta from FWHM and side of the 50%-energy square
 python plot_throughput_ratio.py           # LRIS-2 vs. LRIS throughput and their ratio
 ```
 
-`lris2-etc` and `lris2-compare` are console scripts for `lris2_etc.run_lris2:main` and `lris2_etc.compare_old_new:main`; `python -m lris2_etc.run_lris2` also works. The top-level `plot_*.py` scripts are not part of the package and import it with `from lris2_etc import ...`.
+`lris2-etc`, `lris2-compare` and `lris2-moffat-beta` are console scripts for `lris2_etc.run_lris2:main`, `lris2_etc.compare_old_new:main` and `lris2_etc.moffat_beta:main`; `python -m lris2_etc.run_lris2` also works. The top-level `plot_*.py` scripts are not part of the package and import it with `from lris2_etc import ...`.
 
 Dependencies: numpy ≥ 2.0 (code uses `numpy.trapezoid`, not `trapz`), astropy, scipy, matplotlib. There is no test suite. All output is interactive `plt.show()` windows; nothing is written to disk.
 
@@ -47,7 +48,7 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
 - [Mag.py](lris2_etc/Mag.py): reads a 2-column filter curve (Å, weight) from `data/filters/`, computes λ_eff and the AB magnitude of a spectrum.
 - [Sky.py](lris2_etc/Sky.py): sky spectrum from `data/sky/sky.eps_pang_parcsec_onemicron.fits`, a linear WCS in e⁻/s/Å/arcsec². `rescale(inst)` multiplies by slit width and Å/pix.
 - [Transmission.py](lris2_etc/Transmission.py): hard-coded extinction curve (mag/airmass), returned as a transmission at the given airmass.
-- [Moffat.py](lris2_etc/Moffat.py): Moffat PSF helpers. Only `moffat_frac` is used by the pipeline. `moffat_snr*` and `make_1d_mod` (which prints) are exploratory.
+- [Moffat.py](lris2_etc/Moffat.py): Moffat PSF helpers. Only `moffat_frac` is used by the pipeline. `moffat_beta` inverts it for β, given a FWHM and the side of the centred square holding 50% of the energy. `moffat_snr*` and `make_1d_mod` (which prints) are exploratory.
 - [depreciated/](depreciated/): old code kept for reference. It is not maintained and still uses the pre-package imports.
 - [data/sky/combine_blue_red.py](lris2_etc/data/sky/combine_blue_red.py): one-off script that generated the combined sky FITS. Run it from inside `lris2_etc/data/sky/`. It is not installed with the package.
 

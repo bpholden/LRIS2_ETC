@@ -19,6 +19,7 @@ dependencies = [
 [project.scripts]
 lris2-etc = "lris2_etc.run_lris2:main"
 lris2-compare = "lris2_etc.compare_old_new:main"
+lris2-moffat-beta = "lris2_etc.moffat_beta:main"
 
 [tool.setuptools]
 packages = ["lris2_etc"]

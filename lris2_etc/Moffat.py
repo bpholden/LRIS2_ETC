@@ -1,7 +1,7 @@
 # Moffat
 import astropy.modeling
 import numpy
-from scipy import integrate
+from scipy import integrate, optimize
 
 
 def prep_values(scale_size, dim_size, pix_size):
@@ -116,3 +116,17 @@ def moffat_frac(size, width, height, beta=3):
     frac, _ = integrate.dblquad(lambda y, x: moffat_mod(x, y),
                                 -width/2, width/2, -height/2, height/2)
     return frac
+
+def moffat_beta(size, side, beta_min=1.001, beta_max=1000.):
+    '''
+    moffat_beta(size, side, beta_min=1.001, beta_max=1000.)
+
+    Moffat beta for which a centred square of the given side length holds
+    50% of the energy of a Moffat PSF with FWHM size (same units).
+    '''
+    def resid(beta):
+        return moffat_frac(size, side, side, beta=beta) - 0.5
+    if resid(beta_min) > 0 or resid(beta_max) < 0:
+        raise ValueError(f'no beta in [{beta_min}, {beta_max}] puts 50% of the energy '
+                         f'in a {side} square for FWHM {size}')
+    return optimize.brentq(resid, beta_min, beta_max, xtol=1e-4)

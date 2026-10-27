@@ -25,8 +25,8 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
 
 ## Architecture
 
-- [ExpCalc.py](lris2_etc/ExpCalc.py): `ExpCalc` is the core pipeline. `compute_spectrum(time, slit_length, slit_width, aperture=None)` runs these steps in order. The extraction length is the slit length, or `aperture` × seeing FWHM (capped at the slit length) when `aperture` is given:
-  1. Fraction of a Moffat PSF (`Moffat.moffat_frac`, β=3, seeing used as FWHM) inside slit width × extraction length, by exact 2D integration.
+- [ExpCalc.py](lris2_etc/ExpCalc.py): `ExpCalc` is the core pipeline. `compute_spectrum(time, slit_length, slit_width, aperture=None, beta=3)` runs these steps in order. The extraction length is the slit length, or `aperture` × seeing FWHM (capped at the slit length) when `aperture` is given:
+  1. Fraction of a Moffat PSF (`Moffat.moffat_frac`, β from `beta`, seeing used as FWHM) inside slit width × extraction length, by exact 2D integration.
   2. Read the template (FITS ext 1, `WAVELENGTH`/`FLUX` columns in erg/s/cm²/Å) and redshift its wavelengths.
   3. Scale to `app_mag` by computing the template's AB mag through the filter (`Mag.compute_ABmag`).
   4. Multiply by exposure time, slit fraction and telescope area, then convert to photons.
@@ -35,7 +35,7 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
   7. Convert source and sky from per Å to per dispersion pixel (× `Ang_per_pix`·`bind`). Compute variance = source + sky + npix·dark·t + npix·RN², where npix is the number of spatial pixels in the extraction length.
   8. If `per_angstrom=True`, divide signal, sky and variance by Å/pix, so SNR per Å = SNR per pixel / √(Å/pix).
 
-  Results land in attributes over `waves[in_band]`: `signal`, `sky_flux`, `noise` (σ), `snr`, all per pixel or per Å as requested. `flux` remains the full-grid source spectrum in photons/Å. The scripts expose the option as `--per_angstrom`/`-A`; `aperture` as `--aperture`/`-x`.
+  Results land in attributes over `waves[in_band]`: `signal`, `sky_flux`, `noise` (σ), `snr`, all per pixel or per Å as requested. `flux` remains the full-grid source spectrum in photons/Å. The scripts expose the option as `--per_angstrom`/`-A`; `aperture` as `--aperture`/`-x`; `run_lris2` also exposes `beta` as `--beta`/`-b`.
 - [Instrument.py](lris2_etc/Instrument.py): `Instrument` is a parameter bag. Its configurator methods each take a `Telescope`:
   - `lris2_red` (R400/R725p1/R725p2) and `lris2_blue` (B600/B1250p1/B1250p2) for LRIS-2. The p1/p2 gratings each cover part of the arm, so they set narrower `BLUE_CUTOFF`/`RED_CUTOFF` values. The cutoffs are set by physical limits other than the efficiency curves. Their old design names, which still appear in the PDR spreadsheets, were R750→R725p1, R700→R725p2, B1300→B1250p1 and B1200→B1250p2.
   - `lris_red` and `lris_blue` for the current LRIS.

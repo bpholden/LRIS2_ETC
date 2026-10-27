@@ -16,6 +16,7 @@ def parse_args():
     parser.add_argument('--time', '-t', type=float, default=1200, help='exposure time (1200 s)')
     parser.add_argument('--airmass', '-a', type=float, default=1.2, help='Airmass (1.2)')
     parser.add_argument('--seeing', '-s', type=float, default=1.0, help='seeing (1.0 arcsec)')
+    parser.add_argument('--beta', '-b', type=float, default=3, help='Moffat PSF beta (3)')
     parser.add_argument('--slit_width', '-w', type=float, default=0.7, \
                         help='slit width (0.7 arcsec)')
     parser.add_argument('--slit_length', '-l', type=float, default=8, \
@@ -58,10 +59,10 @@ def main(args=None):
 
     blue_exp_calc.compute_spectrum(args.time, args.slit_length,\
                                                           args.slit_width, per_angstrom=args.per_angstrom,
-                                                          aperture=args.aperture)
+                                                          aperture=args.aperture, beta=args.beta)
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                       args.slit_width, per_angstrom=args.per_angstrom,
-                                                      aperture=args.aperture)
+                                                      aperture=args.aperture, beta=args.beta)
 
     _, _ = plt.subplots(figsize=(12, 6))
     plt.plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b-', label='Blue')

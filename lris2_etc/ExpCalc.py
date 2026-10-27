@@ -106,15 +106,16 @@ class ExpCalc():
         return
 
     def compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None,
-                         per_angstrom=False, aperture=None):
+                         per_angstrom=False, aperture=None, beta=3):
         '''
         compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None,
-                         per_angstrom=False, aperture=None)
+                         per_angstrom=False, aperture=None, beta=3)
 
         Computes the signal, noise and SNR per dispersion pixel, summed over
         the spatial pixels along the slit. If aperture is given, the sum is
         instead over an extraction length of aperture x seeing FWHM, capped at
-        the slit length. If per_angstrom is True, these are then converted to
+        the slit length. The seeing is a Moffat PSF with this beta and FWHM
+        self.seeing. If per_angstrom is True, these are then converted to
         per Angstrom using the Angstroms per pixel.
         '''
         self.per_angstrom = per_angstrom
@@ -129,7 +130,7 @@ class ExpCalc():
         extract_length = slit_length
         if aperture:
             extract_length = min(aperture*self.seeing, slit_length)
-        frac = Moffat.moffat_frac(self.seeing, slit_width, extract_length)
+        frac = Moffat.moffat_frac(self.seeing, slit_width, extract_length, beta=beta)
 
         self.mag = Mag.Mag(self.filter)
         self.read_template()

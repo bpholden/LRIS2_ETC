@@ -30,6 +30,7 @@ class Mag:
         the filter file should have two columns:
         wavelength (should be in the Angstroms)
         weight (the weight of the filter at that wavelength)
+        except the LSST files, whose wavelengths are in nm
         '''
         files = os.listdir(self.filter_dir)
         for filename in files:
@@ -39,6 +40,8 @@ class Mag:
         fn = os.path.join(self.filter_dir, fn)
         data = astropy.io.ascii.read(fn)
         self.wave = data['col1']
+        if 'LSST' in os.path.basename(fn):
+            self.wave = self.wave * 10 # nm to Angstroms
         self.weight = data['col2']
         self.lambda_eff = self.compute_lambda_eff()
 

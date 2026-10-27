@@ -15,11 +15,19 @@ lris2-etc -x 1.5                          # extract 1.5 x seeing FWHM along the 
 lris2-compare                             # LRIS-2 vs. LRIS SNR / flux / sky
 lris2-moffat-beta 0.8 0.904               # Moffat beta from FWHM and side of the 50%-energy square
 python plot_throughput_ratio.py           # LRIS-2 vs. LRIS throughput and their ratio
+jupyter notebook validate_math.ipynb      # hand check of the photon rates, efficiencies and SNR
 ```
 
 `lris2-etc`, `lris2-compare` and `lris2-moffat-beta` are console scripts for `lris2_etc.run_lris2:main`, `lris2_etc.compare_old_new:main` and `lris2_etc.moffat_beta:main`; `python -m lris2_etc.run_lris2` also works. The top-level `plot_*.py` scripts are not part of the package and import it with `from lris2_etc import ...`.
 
 Dependencies: numpy ≥ 2.0 (code uses `numpy.trapezoid`, not `trapz`), astropy, scipy, matplotlib. There is no test suite. All output is interactive `plt.show()` windows; nothing is written to disk.
+
+[validate_math.ipynb](validate_math.ipynb) is a hand check of the basic math, with every step written out and the package used only to read data files. It is saved with its outputs. It covers:
+- photons s⁻¹ Å⁻¹ for Keck I from an AB magnitude and from the Mauna Kea sky table, checked against `Sky()`;
+- the B600 and R400 efficiency rebuilt from its components and multiplied by the atmosphere at airmass 1.2, checked against `Instrument.read_throughput` and averaged over each filter;
+- SNR per Å for an m_AB = 22 source in the square holding 50% of its light, against the square's area.
+
+It uses SDSS u'g'r'i' and LSST z, the same filters as `SKY_MAGS`, because SDSS z' runs past the end of R400 and the sky spectrum.
 
 Inside the package, modules import each other relatively (`from . import Sky`). The module names keep their original capitalization (`lris2_etc.ExpCalc`, `lris2_etc.Instrument`, …).
 
@@ -46,9 +54,9 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
   - LRIS and DEIMOS read XIDL `sens_<name>_<grating>.fits.gz` files.
 - [Telescope.py](lris2_etc/Telescope.py): collecting area (cm²) and plate scale ("/mm). Build it with `Telescope(name='keck1')`, or with `Telescope()` and then `.keckone()`.
 - [Mag.py](lris2_etc/Mag.py): reads a 2-column filter curve (Å, weight) from `data/filters/`, computes λ_eff and the AB magnitude of a spectrum.
-- [Sky.py](lris2_etc/Sky.py): sky spectrum from `data/sky/sky.eps_pang_parcsec_onemicron.fits`, a linear WCS in e⁻/s/Å/arcsec² for the Keck I collecting area. The pipeline treats it as the sky before any throughput; it multiplies by throughput but not by telescope area. On construction, `scale_to_mags` rescales it so its photon-weighted AB mags in SDSS u'g'r'i'z' match `SKY_MAGS`, the Mauna Kea dark sky (22.9, 22.0, 21.4, 20.4, 19.4 mag/arcsec²). The correction is interpolated linearly between the filter effective wavelengths and held constant beyond u' and z'. `rescale(inst)` multiplies by slit width and Å/pix.
+- [Sky.py](lris2_etc/Sky.py): sky spectrum from `data/sky/sky.eps_pang_parcsec_onemicron.fits`, a linear WCS in e⁻/s/Å/arcsec² for the Keck I collecting area. The pipeline treats it as the sky before any throughput; it multiplies by throughput but not by telescope area. On construction, `scale_to_mags` rescales it so its photon-weighted AB mags in SDSS u'g'r'i' and LSST z match `SKY_MAGS`, the Mauna Kea dark sky (22.9, 22.0, 21.4, 20.4, 19.4 mag/arcsec²). The correction is interpolated linearly between the filter effective wavelengths and held constant beyond u' and z. `rescale(inst)` multiplies by slit width and Å/pix.
   - **The sky model is provisional.** The spectrum was observed with LRIS, and it is not known whether the telescope + instrument throughput was removed. Taken as it stands, it is 1.5–2 mag fainter than `SKY_MAGS` in every band, by about the LRIS throughput. Divided by the LRIS throughput, it matches `SKY_MAGS` to ±0.5 mag. So the throughput was probably not removed, and `scale_to_mags` corrects for this until a better sky model replaces the file. It cut the default SNR by about 40%.
-  - The sky stops at 9993 Å, while the SDSS z' curve runs to 13500 Å, so the z' match uses only the part of the filter below 9993 Å. The sky below about 3560 Å (the u' effective wavelength) keeps the u' correction, even though the LRIS throughput falls off there.
+  - LSST z is used rather than SDSS z' because the sky stops at 9993 Å, while the SDSS z' curve runs to 13500 Å. The sky below about 3560 Å (the u' effective wavelength) keeps the u' correction, even though the LRIS throughput falls off there.
 - [Transmission.py](lris2_etc/Transmission.py): hard-coded extinction curve (mag/airmass), returned as a transmission at the given airmass.
 - [Moffat.py](lris2_etc/Moffat.py): Moffat PSF helpers. Only `moffat_frac` is used by the pipeline. `moffat_beta` inverts it for β, given a FWHM and the side of the centred square holding 50% of the energy. `moffat_snr*` and `make_1d_mod` (which prints) are exploratory.
 - [depreciated/](depreciated/): old code kept for reference. It is not maintained and still uses the pre-package imports.
@@ -59,7 +67,7 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
 All data lives under `lris2_etc/data/`, which `pyproject.toml` ships as package data. A new file in a new subdirectory, or with an extension the `package-data` globs don't cover, also has to be added there, or it will be missing from non-editable installs.
 
 - `templates/`: Kinney-Calzetti galaxy, QSO, SN Ia, PN and Pickles stellar templates (FITS tables).
-- `filters/`: SDSS u'g'r'i'z', LSST ugrizy and Bessell V. The LSST files have `#` header lines, which astropy skips.
+- `filters/`: SDSS u'g'r'i'z', LSST ugrizy and Bessell V. The LSST files have `#` header lines, which astropy skips. The LSST files give wavelength in nm; `Mag.read_filter` converts any file with `LSST` in its name to Å. All other filter files are in Å.
 - `throughput/`: all LRIS-2 curves have wavelength in nm.
   - `<grating>_tot_eff.csv`: the older total-efficiency curves (`wavelength`, `throughput`, including Keck). The code no longer reads them; they are kept for comparison.
   - Component curves split out of the PDR efficiency spreadsheets, to be replaced with measured values over time. The code multiplies these to get the LRIS-2 throughput:

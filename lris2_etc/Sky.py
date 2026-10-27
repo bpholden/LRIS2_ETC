@@ -7,9 +7,10 @@ from . import DATA_DIR
 from . import Mag
 from . import Telescope
 
-# Mauna Kea dark sky, AB mag/arcsec^2
+# Mauna Kea dark sky, AB mag/arcsec^2. LSST z, not SDSS z', which runs past
+# the end of the sky spectrum
 SKY_MAGS = {'sdss_uprime': 22.9, 'sdss_gprime': 22.0, 'sdss_rprime': 21.4,
-            'sdss_iprime': 20.4, 'sdss_zprime': 19.4}
+            'sdss_iprime': 20.4, 'LSST_LSST.z': 19.4}
 
 class Sky:
 

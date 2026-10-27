@@ -46,11 +46,13 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
   - LRIS and DEIMOS read XIDL `sens_<name>_<grating>.fits.gz` files.
 - [Telescope.py](lris2_etc/Telescope.py): collecting area (cm²) and plate scale ("/mm). Build it with `Telescope(name='keck1')`, or with `Telescope()` and then `.keckone()`.
 - [Mag.py](lris2_etc/Mag.py): reads a 2-column filter curve (Å, weight) from `data/filters/`, computes λ_eff and the AB magnitude of a spectrum.
-- [Sky.py](lris2_etc/Sky.py): sky spectrum from `data/sky/sky.eps_pang_parcsec_onemicron.fits`, a linear WCS in e⁻/s/Å/arcsec². `rescale(inst)` multiplies by slit width and Å/pix.
+- [Sky.py](lris2_etc/Sky.py): sky spectrum from `data/sky/sky.eps_pang_parcsec_onemicron.fits`, a linear WCS in e⁻/s/Å/arcsec² for the Keck I collecting area. The pipeline treats it as the sky before any throughput; it multiplies by throughput but not by telescope area. On construction, `scale_to_mags` rescales it so its photon-weighted AB mags in SDSS u'g'r'i'z' match `SKY_MAGS`, the Mauna Kea dark sky (22.9, 22.0, 21.4, 20.4, 19.4 mag/arcsec²). The correction is interpolated linearly between the filter effective wavelengths and held constant beyond u' and z'. `rescale(inst)` multiplies by slit width and Å/pix.
+  - **The sky model is provisional.** The spectrum was observed with LRIS, and it is not known whether the telescope + instrument throughput was removed. Taken as it stands, it is 1.5–2 mag fainter than `SKY_MAGS` in every band, by about the LRIS throughput. Divided by the LRIS throughput, it matches `SKY_MAGS` to ±0.5 mag. So the throughput was probably not removed, and `scale_to_mags` corrects for this until a better sky model replaces the file. It cut the default SNR by about 40%.
+  - The sky stops at 9993 Å, while the SDSS z' curve runs to 13500 Å, so the z' match uses only the part of the filter below 9993 Å. The sky below about 3560 Å (the u' effective wavelength) keeps the u' correction, even though the LRIS throughput falls off there.
 - [Transmission.py](lris2_etc/Transmission.py): hard-coded extinction curve (mag/airmass), returned as a transmission at the given airmass.
 - [Moffat.py](lris2_etc/Moffat.py): Moffat PSF helpers. Only `moffat_frac` is used by the pipeline. `moffat_beta` inverts it for β, given a FWHM and the side of the centred square holding 50% of the energy. `moffat_snr*` and `make_1d_mod` (which prints) are exploratory.
 - [depreciated/](depreciated/): old code kept for reference. It is not maintained and still uses the pre-package imports.
-- [data/sky/combine_blue_red.py](lris2_etc/data/sky/combine_blue_red.py): one-off script that generated the combined sky FITS. Run it from inside `lris2_etc/data/sky/`. It is not installed with the package.
+- [data/sky/combine_blue_red.py](lris2_etc/data/sky/combine_blue_red.py): one-off script that generated the combined sky FITS from the LRIS blue (3002–6496 Å) and red (4700–9996 Å) spectra. Where the two overlap it adds them, which is right for counts taken through the LRIS dichroic. Run it from inside `lris2_etc/data/sky/`. It is not installed with the package.
 
 ## Data
 

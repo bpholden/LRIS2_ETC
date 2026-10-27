@@ -2,6 +2,7 @@
 import argparse
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from . import ExpCalc
 from . import Instrument
@@ -35,6 +36,29 @@ def parse_args():
                         help='extraction length in units of the seeing FWHM (full slit)')
     return parser.parse_args()
 
+def median_snr(exp_calc, wave_min, wave_max):
+    '''
+    median_snr(exp_calc, wave_min, wave_max)
+
+    Median SNR between wave_min and wave_max (Angstroms), or None if the
+    arm has no points there.
+    '''
+    waves = exp_calc.waves[exp_calc.in_band]
+    sel = (waves >= wave_min) & (waves <= wave_max)
+    if not sel.any():
+        return None
+    return np.median(exp_calc.snr[sel])
+
+def print_median_snr(label, exp_calcs, wave_min, wave_max):
+    '''
+    print_median_snr(label, exp_calcs, wave_min, wave_max)
+    '''
+    out = []
+    for arm, exp_calc in exp_calcs.items():
+        snr = median_snr(exp_calc, wave_min, wave_max)
+        out.append(f'{arm} ' + ('n/a' if snr is None else f'{snr:.2f}'))
+    print(f'{label}: ' + ', '.join(out))
+
 def main(args=None):
     '''
     Run the exposure time calculator.
@@ -63,6 +87,17 @@ def main(args=None):
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                       args.slit_width, per_angstrom=args.per_angstrom,
                                                       aperture=args.aperture, beta=args.beta)
+
+    # the filter used to scale the template: its half-maximum range and its centre
+    mag = red_exp_calc.mag
+    in_filter = mag.weight >= 0.5*mag.weight.max()
+    unit = 'per Angstrom' if args.per_angstrom else 'per pixel'
+    exp_calcs = {'Blue': blue_exp_calc, 'Red': red_exp_calc}
+    print_median_snr(f'Median SNR {unit} over {args.filter} '
+                     f'({mag.wave[in_filter].min():.0f}-{mag.wave[in_filter].max():.0f} A)',
+                     exp_calcs, mag.wave[in_filter].min(), mag.wave[in_filter].max())
+    print_median_snr(f'Median SNR {unit} at {args.filter} centre ({mag.lambda_eff:.0f} +/- 10 A)',
+                     exp_calcs, mag.lambda_eff - 10, mag.lambda_eff + 10)
 
     _, _ = plt.subplots(figsize=(12, 6))
     plt.plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b-', label='Blue')

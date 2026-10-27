@@ -47,7 +47,7 @@ def parse_args():
     parser.add_argument('--time', '-t', type=float, default=1200, help='exposure time (1200 s)')
     parser.add_argument('--airmass', '-a', type=float, default=1.2, help='Airmass (1.2)')
     parser.add_argument('--seeing', '-s', type=float, default=1.0, help='seeing (1.0 arcsec)')
-    parser.add_argument('--beta', '-b', type=float, default=3, help='Moffat PSF beta (3)')
+    parser.add_argument('--beta', '-b', type=float, default=4, help='Moffat PSF beta (3)')
     parser.add_argument('--slit_width', '-w', type=float, default=0.7, \
                         help='slit width (0.7 arcsec)')
     parser.add_argument('--slit_length', '-l', type=float, default=8, \

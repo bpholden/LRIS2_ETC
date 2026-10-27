@@ -11,6 +11,7 @@ pip install -e .                          # editable install for development
 lris2-etc                                 # LRIS-2 blue+red SNR plot, defaults: r'=22, 1200 s, starb1
 lris2-etc -m 20 -t 600 -z 0.5 -T elliptical --red_grism R725p2 --blue_grism B1250p2
 lris2-etc --flux_plots                    # also show intermediate flux plots at each pipeline stage
+lris2-etc -c example_config.ini -m 21     # options from an INI file; command line options override it
 lris2-etc -x 1.5                          # extract 1.5 x seeing FWHM along the slit instead of the full slit
 lris2-compare                             # LRIS-2 vs. LRIS SNR / flux / sky
 lris2-moffat-beta 0.8 0.904               # Moffat beta from FWHM and side of the 50%-energy square
@@ -92,5 +93,7 @@ All data lives under `lris2_etc/data/`, which `pyproject.toml` ships as package 
 - `Sky.rescale` multiplies by `Ang_per_pix` by default (`per_pix=True`). `ExpCalc` calls it with `per_pix=False` and does the per-pixel conversion itself.
 
 ## Conventions
+
+`lris2-etc --config/-c FILE` reads an INI file with a `[lris2-etc]` section ([example_config.ini](example_config.ini)), parsed with `configparser`. Its keys are the long option names, and each value is converted with that option's type. An unknown key or a bad value is an error. The config values become the argparse defaults, so the command line wins. The script prints a note for each config value that the command line changes. A flag set `true` in the file can't be turned off from the command line.
 
 Classes are configured by calling methods after construction, not through constructor arguments, as with `Instrument().lris2_red(tel)`. Docstrings mostly just repeat the signature. CLI scripts use `argparse` with short flags (`-m -t -z -a -s -w -l -f -T`) and share one set of defaults: r'=22, 1200 s, airmass 1.2, seeing 1.0", slit 0.7"×8", template starb1.

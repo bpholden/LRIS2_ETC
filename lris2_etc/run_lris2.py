@@ -1,5 +1,6 @@
 '''Run the exposure time calculator'''
 import argparse
+import configparser
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,6 +8,35 @@ import numpy as np
 from . import ExpCalc
 from . import Instrument
 from . import Telescope
+
+CONFIG_SECTION = 'lris2-etc'
+
+def read_config(parser, filename):
+    '''
+    read_config(parser, filename)
+
+    Reads the [lris2-etc] section of an INI file. Keys are the long option
+    names, and values are converted with the option's own type.
+    '''
+    config = configparser.ConfigParser()
+    if not config.read(filename):
+        parser.error(f'cannot read config file {filename}')
+    if CONFIG_SECTION not in config:
+        parser.error(f'config file {filename} has no [{CONFIG_SECTION}] section')
+    actions = {action.dest: action for action in parser._actions}
+    values = {}
+    for key, value in config[CONFIG_SECTION].items():
+        action = actions.get(key)
+        if action is None or key in ('help', 'config'):
+            parser.error(f'unknown option {key} in config file {filename}')
+        try:
+            if action.nargs == 0: # store_true flags
+                values[key] = config[CONFIG_SECTION].getboolean(key)
+            else:
+                values[key] = action.type(value) if action.type else value
+        except ValueError:
+            parser.error(f'bad value {value!r} for {key} in config file {filename}')
+    return values
 
 def parse_args():
     '''
@@ -34,7 +64,22 @@ def parse_args():
                         help='signal and noise per Angstrom instead of per pixel')
     parser.add_argument('--aperture', '-x', type=float, default=None, \
                         help='extraction length in units of the seeing FWHM (full slit)')
-    return parser.parse_args()
+    parser.add_argument('--config', '-c', type=str, default=None, \
+                        help=f'INI file with a [{CONFIG_SECTION}] section; '
+                        'command line options override it')
+
+    # config file values replace the defaults, so the command line still wins
+    args, _ = parser.parse_known_args()
+    config = {}
+    if args.config:
+        config = read_config(parser, args.config)
+        parser.set_defaults(**config)
+    args = parser.parse_args()
+    for key, value in config.items():
+        if getattr(args, key) != value:
+            print(f'Note: command line {key} = {getattr(args, key)} '
+                  f'overrides {value} from {args.config}')
+    return args
 
 def median_snr(exp_calc, wave_min, wave_max):
     '''

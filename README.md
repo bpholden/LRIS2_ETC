@@ -38,9 +38,10 @@ In a config file, use the long option name without the dashes as the key, for ex
 | `--red_grism` | `R400` | Red grating: `R400`, `R725p1` or `R725p2`. |
 | `--per_angstrom`, `-A` | off | Report signal, noise and SNR per Å rather than per dispersion pixel. |
 | `--flux_plots` | off | Also show plots of the source spectrum at the intermediate steps. |
+| `--wavelength`, `-W` | effective wavelength of `--filter` | Wavelength in Å for the printed ±10 Å median SNR, for example `7000`. |
 | `--config`, `-c` | none | INI file with a `[lris2-etc]` section that sets any of the options above. |
 
 The `--filter` and `--template` names match any file whose name contains them, and the first match wins. Use a fragment that matches only one file, such as `sdss_rprime` rather than `r`.
 
-As well as the SNR plot, `lris2-etc` prints the median SNR for each arm over the half-maximum range of `--filter` and within ±10 Å of its effective wavelength.
+As well as the SNR plot, `lris2-etc` prints the median SNR for each arm over the half-maximum range of `--filter` and within ±10 Å of its effective wavelength, or of `--wavelength` if given.
 

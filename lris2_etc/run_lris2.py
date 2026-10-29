@@ -64,6 +64,9 @@ def parse_args():
                         help='signal and noise per Angstrom instead of per pixel')
     parser.add_argument('--aperture', '-x', type=float, default=None, \
                         help='extraction length in units of the seeing FWHM (full slit)')
+    parser.add_argument('--wavelength', '-W', type=float, default=None, \
+                        help='wavelength (Angstroms) of the +/- 10 A median SNR '
+                        '(filter effective wavelength)')
     parser.add_argument('--config', '-c', type=str, default=None, \
                         help=f'INI file with a [{CONFIG_SECTION}] section; '
                         'command line options override it')
@@ -133,7 +136,8 @@ def main(args=None):
                                                       args.slit_width, per_angstrom=args.per_angstrom,
                                                       aperture=args.aperture, beta=args.beta)
 
-    # the filter used to scale the template: its half-maximum range and its centre
+    # the filter used to scale the template: its half-maximum range, and its centre
+    # unless a wavelength was given
     mag = red_exp_calc.mag
     in_filter = mag.weight >= 0.5*mag.weight.max()
     unit = 'per Angstrom' if args.per_angstrom else 'per pixel'
@@ -141,8 +145,14 @@ def main(args=None):
     print_median_snr(f'Median SNR {unit} over {args.filter} '
                      f'({mag.wave[in_filter].min():.0f}-{mag.wave[in_filter].max():.0f} A)',
                      exp_calcs, mag.wave[in_filter].min(), mag.wave[in_filter].max())
-    print_median_snr(f'Median SNR {unit} at {args.filter} centre ({mag.lambda_eff:.0f} +/- 10 A)',
-                     exp_calcs, mag.lambda_eff - 10, mag.lambda_eff + 10)
+    if args.wavelength is None:
+        wave = mag.lambda_eff
+        where = f'{args.filter} centre'
+    else:
+        wave = args.wavelength
+        where = 'requested wavelength'
+    print_median_snr(f'Median SNR {unit} at {where} ({wave:.0f} +/- 10 A)',
+                     exp_calcs, wave - 10, wave + 10)
 
     _, _ = plt.subplots(figsize=(12, 6))
     plt.plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b-', label='Blue')

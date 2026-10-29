@@ -60,6 +60,8 @@ def parse_args():
     parser.add_argument('--template', '-T', type=str, default='starb1', \
                         help='Template file (starb1)')
     parser.add_argument('--flux_plots', action='store_true', help='make flux plots')
+    parser.add_argument('--no_plot', '-n', action='store_true', \
+                        help='print the text output only, without the SNR plot')
     parser.add_argument('--per_angstrom', '-A', action='store_true', \
                         help='signal and noise per Angstrom instead of per pixel')
     parser.add_argument('--aperture', '-x', type=float, default=None, \
@@ -153,6 +155,9 @@ def main(args=None):
         where = 'requested wavelength'
     print_median_snr(f'Median SNR {unit} at {where} ({wave:.0f} +/- 10 A)',
                      exp_calcs, wave - 10, wave + 10)
+
+    if args.no_plot:
+        return
 
     _, _ = plt.subplots(figsize=(12, 6))
     plt.plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b-', label='Blue')

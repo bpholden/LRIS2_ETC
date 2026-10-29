@@ -37,6 +37,7 @@ In a config file, use the long option name without the dashes as the key, for ex
 | `--blue_grism` | `B600` | Blue grating: `B600`, `B1250p1` or `B1250p2`. |
 | `--red_grism` | `R400` | Red grating: `R400`, `R725p1` or `R725p2`. |
 | `--per_angstrom`, `-A` | off | Report signal, noise and SNR per Å rather than per dispersion pixel. |
+| `--no_plot`, `-n` | off | Print the text output only, without the SNR plot. `--flux_plots` still shows its plots if given too. |
 | `--flux_plots` | off | Also show plots of the source spectrum at the intermediate steps. |
 | `--wavelength`, `-W` | effective wavelength of `--filter` | Wavelength in Å for the printed ±10 Å median SNR, for example `7000`. |
 | `--config`, `-c` | none | INI file with a `[lris2-etc]` section that sets any of the options above. |

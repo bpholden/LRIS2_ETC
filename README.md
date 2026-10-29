@@ -17,7 +17,7 @@ lris2-compare        # LRIS-2 compared with the current LRIS
 
 There is an example config file called `example_config.ini` 
 
-## lris2-etc options
+## lris2-etc runtime options
 
 In a config file, use the long option name without the dashes as the key, for example `slit_width = 1.0`. An option given on the command line overrides the value in the config file.
 
@@ -44,4 +44,3 @@ The `--filter` and `--template` names match any file whose name contains them, a
 
 As well as the SNR plot, `lris2-etc` prints the median SNR for each arm over the half-maximum range of `--filter` and within ±10 Å of its effective wavelength.
 
-## Options

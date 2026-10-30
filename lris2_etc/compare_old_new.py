@@ -30,6 +30,8 @@ def parse_args():
                         help='signal and noise per Angstrom instead of per pixel')
     parser.add_argument('--aperture', '-x', type=float, default=None, \
                         help='extraction length in units of the seeing FWHM (full slit)')
+    parser.add_argument('--optimal', '-O', action='store_true', \
+                        help='Horne optimal (variance weighted) extraction instead of a sum')
     return parser.parse_args()
 
 def main():
@@ -65,16 +67,20 @@ def main():
 
     blue2_exp_calc.compute_spectrum(args.time, args.slit_length,\
                                                 args.slit_width, per_angstrom=args.per_angstrom,
-                                                aperture=args.aperture)
+                                                aperture=args.aperture,
+                                                optimal=args.optimal)
     red2_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                 args.slit_width, per_angstrom=args.per_angstrom,
-                                                aperture=args.aperture)
+                                                aperture=args.aperture,
+                                                optimal=args.optimal)
     blue_exp_calc.compute_spectrum(args.time, args.slit_length,\
                                                 args.slit_width, per_angstrom=args.per_angstrom,
-                                                aperture=args.aperture)
+                                                aperture=args.aperture,
+                                                optimal=args.optimal)
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                 args.slit_width, per_angstrom=args.per_angstrom,
-                                                aperture=args.aperture)
+                                                aperture=args.aperture,
+                                                optimal=args.optimal)
 
     unit = r'\AA^{-1}' if args.per_angstrom else r'pix^{-1}'
     _, ax = plt.subplots(3, 1, layout='constrained', figsize=(12, 6))
@@ -84,7 +90,8 @@ def main():
     ax[0].plot(blue_exp_calc.waves[blue_exp_calc.in_band], blue_exp_calc.snr, 'b--', label='Blue')
     ax[0].plot(red_exp_calc.waves[red_exp_calc.in_band], red_exp_calc.snr, 'r--', label='Red')
     ax[0].set_xlabel(r'Wavelength ($\AA$)')
-    ax[0].set_ylabel('SNR per Angstrom' if args.per_angstrom else 'SNR per pixel')
+    ax[0].set_ylabel(('SNR per Angstrom' if args.per_angstrom else 'SNR per pixel')
+                     + (', optimal' if args.optimal else ''))
 
     ax[1].plot(blue2_exp_calc.waves[blue2_exp_calc.in_band], blue2_exp_calc.signal, 'b-', label='Blue2')
     ax[1].plot(red2_exp_calc.waves[red2_exp_calc.in_band], red2_exp_calc.signal, 'r-', label='Red2')

@@ -106,17 +106,19 @@ class ExpCalc():
         return
 
     def compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None,
-                         per_angstrom=False, aperture=None, beta=3):
+                         per_angstrom=False, aperture=None, beta=3, optimal=False):
         '''
         compute_spectrum(self, time, slit_length, slit_width, inst=None, telescope=None,
-                         per_angstrom=False, aperture=None, beta=3)
+                         per_angstrom=False, aperture=None, beta=3, optimal=False)
 
         Computes the signal, noise and SNR per dispersion pixel, summed over
         the spatial pixels along the slit. If aperture is given, the sum is
         instead over an extraction length of aperture x seeing FWHM, capped at
         the slit length. The seeing is a Moffat PSF with this beta and FWHM
-        self.seeing. If per_angstrom is True, these are then converted to
-        per Angstrom using the Angstroms per pixel.
+        self.seeing. If optimal is True, the spatial pixels are combined with
+        Horne (1986) variance weighting instead of summed. If per_angstrom is
+        True, these are then converted to per Angstrom using the Angstroms per
+        pixel.
         '''
         self.per_angstrom = per_angstrom
 
@@ -130,7 +132,20 @@ class ExpCalc():
         extract_length = slit_length
         if aperture:
             extract_length = min(aperture*self.seeing, slit_length)
-        frac = Moffat.moffat_frac(self.seeing, slit_width, extract_length, beta=beta)
+
+        # number of spatial pixels in the extraction (extract_length is in arcsec)
+        pix_length = self.instrument.scale_perp * self.instrument.bins
+        npix = int(round(extract_length / pix_length))
+        if npix < 2:
+            npix = 2
+
+        if optimal:
+            # fraction of the PSF in each spatial pixel; the extraction holds their sum
+            pix_frac = Moffat.moffat_slit_profile(self.seeing, slit_width, npix, pix_length,
+                                                  beta=beta)
+            frac = pix_frac.sum()
+        else:
+            frac = Moffat.moffat_frac(self.seeing, slit_width, extract_length, beta=beta)
 
         self.mag = Mag.Mag(self.filter)
         self.read_template()
@@ -168,11 +183,6 @@ class ExpCalc():
             plt.title(f'Photons after throughput and extinction {self.instrument.name}')
             plt.show()
 
-        # number of spatial pixels in the extraction (extract_length is in arcsec)
-        npix = int(round(extract_length / (self.instrument.scale_perp * self.instrument.bins)))
-        if npix < 2:
-            npix = 2
-
         self.in_band = (self.waves > self.instrument.BLUE_CUTOFF) &\
               (self.waves < self.instrument.RED_CUTOFF)
         sky_band = (self.sky.wave > self.instrument.BLUE_CUTOFF) &\
@@ -189,10 +199,20 @@ class ExpCalc():
         self.signal = self.flux[self.in_band] * ang_per_pix
         self.sky_flux *= ang_per_pix
 
-        # variance per dispersion pixel; dark and read noise come from npix spatial pixels
-        variance = self.signal + self.sky_flux
-        variance += npix*self.instrument.dark*time
-        variance += npix*self.instrument.readnoise**2
+        if optimal:
+            # Horne (1986): weight each spatial pixel by P/V, where P is the profile
+            # normalised over the extraction and V the pixel variance (its source, an
+            # even share of the sky, dark and read noise). The extracted flux then has
+            # variance 1 / sum(P^2 / V).
+            profile = pix_frac / frac
+            pix_var = self.signal[:, None]*profile[None, :] + self.sky_flux[:, None]/npix
+            pix_var += self.instrument.dark*time + self.instrument.readnoise**2
+            variance = 1. / np.sum(profile[None, :]**2 / pix_var, axis=1)
+        else:
+            # variance per dispersion pixel; dark and read noise come from npix spatial pixels
+            variance = self.signal + self.sky_flux
+            variance += npix*self.instrument.dark*time
+            variance += npix*self.instrument.readnoise**2
 
         if per_angstrom:
             # a 1 Angstrom bin holds 1/ang_per_pix pixels: signal and variance both

@@ -34,6 +34,7 @@ In a config file, use the long option name without the dashes as the key, for ex
 | `--slit_width`, `-w` | `0.7` | Slit width in arcsec. |
 | `--slit_length`, `-l` | `8` | Slit length in arcsec. |
 | `--aperture`, `-x` | none (whole slit) | Extraction length along the slit, in units of the seeing FWHM, for example `1.5`. It is capped at the slit length. If left out, the whole slit length is summed. |
+| `--optimal`, `-O` | off | Horne (1986) optimal extraction: the spatial pixels within `--aperture` (or the whole slit) are weighted by profile / variance instead of summed. |
 | `--blue_grism` | `B600` | Blue grating: `B600`, `B1250p1` or `B1250p2`. |
 | `--red_grism` | `R400` | Red grating: `R400`, `R725p1` or `R725p2`. |
 | `--per_angstrom`, `-A` | off | Report signal, noise and SNR per Å rather than per dispersion pixel. |

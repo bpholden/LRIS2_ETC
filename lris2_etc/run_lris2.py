@@ -66,6 +66,8 @@ def parse_args():
                         help='signal and noise per Angstrom instead of per pixel')
     parser.add_argument('--aperture', '-x', type=float, default=None, \
                         help='extraction length in units of the seeing FWHM (full slit)')
+    parser.add_argument('--optimal', '-O', action='store_true', \
+                        help='Horne optimal (variance weighted) extraction instead of a sum')
     parser.add_argument('--wavelength', '-W', type=float, default=None, \
                         help='wavelength (Angstroms) of the +/- 10 A median SNR '
                         '(filter effective wavelength)')
@@ -133,16 +135,20 @@ def main(args=None):
 
     blue_exp_calc.compute_spectrum(args.time, args.slit_length,\
                                                           args.slit_width, per_angstrom=args.per_angstrom,
-                                                          aperture=args.aperture, beta=args.beta)
+                                                          aperture=args.aperture, beta=args.beta,
+                                                          optimal=args.optimal)
     red_exp_calc.compute_spectrum(args.time, args.slit_length, \
                                                       args.slit_width, per_angstrom=args.per_angstrom,
-                                                      aperture=args.aperture, beta=args.beta)
+                                                      aperture=args.aperture, beta=args.beta,
+                                                      optimal=args.optimal)
 
     # the filter used to scale the template: its half-maximum range, and its centre
     # unless a wavelength was given
     mag = red_exp_calc.mag
     in_filter = mag.weight >= 0.5*mag.weight.max()
     unit = 'per Angstrom' if args.per_angstrom else 'per pixel'
+    if args.optimal:
+        unit += ', optimal extraction'
     exp_calcs = {'Blue': blue_exp_calc, 'Red': red_exp_calc}
     print_median_snr(f'Median SNR {unit} over {args.filter} '
                      f'({mag.wave[in_filter].min():.0f}-{mag.wave[in_filter].max():.0f} A)',

@@ -34,17 +34,22 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
 
 ## Architecture
 
-- [ExpCalc.py](lris2_etc/ExpCalc.py): `ExpCalc` is the core pipeline. `compute_spectrum(time, slit_length, slit_width, aperture=None, beta=3)` runs these steps in order. The extraction length is the slit length, or `aperture` × seeing FWHM (capped at the slit length) when `aperture` is given:
+- [ExpCalc.py](lris2_etc/ExpCalc.py): `ExpCalc` is the core pipeline. `compute_spectrum(time, slit_length, slit_width, aperture=None, beta=3, optimal=False)` runs these steps in order. The extraction length is the slit length, or `aperture` × seeing FWHM (capped at the slit length) when `aperture` is given:
   1. Fraction of a Moffat PSF (`Moffat.moffat_frac`, β from `beta`, seeing used as FWHM) inside slit width × extraction length, by exact 2D integration.
   2. Read the template (FITS ext 1, `WAVELENGTH`/`FLUX` columns in erg/s/cm²/Å) and redshift its wavelengths.
   3. Scale to `app_mag` by computing the template's AB mag through the filter (`Mag.compute_ABmag`).
   4. Multiply by exposure time, slit fraction and telescope area, then convert to photons.
   5. Apply atmospheric extinction (`Transmission`) and instrument throughput.
   6. Interpolate the sky onto the template grid and scale it by extraction length and throughput.
-  7. Convert source and sky from per Å to per dispersion pixel (× `Ang_per_pix`·`bind`). Compute variance = source + sky + npix·dark·t + npix·RN², where npix is the number of spatial pixels in the extraction length.
+  7. Convert source and sky from per Å to per dispersion pixel (× `Ang_per_pix`·`bind`). Compute variance = source + sky + npix·dark·t + npix·RN², where npix is the number of spatial pixels in the extraction length. With `optimal=True` the spatial pixels are combined with Horne (1986) weighting instead:
+     - P_i is the PSF fraction in each pixel (`Moffat.moffat_slit_profile`), normalised over the extraction.
+     - V_i = signal·P_i + sky/npix + dark·t + RN² is the variance of pixel i.
+     - The variance of the extracted flux is 1 / Σ P_i²/V_i.
+
+     The signal in both modes is the source flux inside the extraction, so the two SNRs compare directly. Optimal extraction assumes the profile is known exactly, centred, and the same at every wavelength.
   8. If `per_angstrom=True`, divide signal, sky and variance by Å/pix, so SNR per Å = SNR per pixel / √(Å/pix).
 
-  Results land in attributes over `waves[in_band]`: `signal`, `sky_flux`, `noise` (σ), `snr`, all per pixel or per Å as requested. `flux` remains the full-grid source spectrum in photons/Å. The scripts expose the option as `--per_angstrom`/`-A`; `aperture` as `--aperture`/`-x`; `run_lris2` also exposes `beta` as `--beta`/`-b`.
+  Results land in attributes over `waves[in_band]`: `signal`, `sky_flux`, `noise` (σ), `snr`, all per pixel or per Å as requested. `flux` remains the full-grid source spectrum in photons/Å. The scripts expose the option as `--per_angstrom`/`-A`; `aperture` as `--aperture`/`-x`; `run_lris2` also exposes `beta` as `--beta`/`-b` and `optimal` as `--optimal`/`-O`.
 - [Instrument.py](lris2_etc/Instrument.py): `Instrument` is a parameter bag. Its configurator methods each take a `Telescope`:
   - `lris2_red` (R400/R725p1/R725p2) and `lris2_blue` (B600/B1250p1/B1250p2) for LRIS-2. The p1/p2 gratings each cover part of the arm, so they set narrower `BLUE_CUTOFF`/`RED_CUTOFF` values. The cutoffs are set by physical limits other than the efficiency curves. Their old design names, which still appear in the PDR spreadsheets, were R750→R725p1, R700→R725p2, B1300→B1250p1 and B1200→B1250p2.
   - `lris_red` and `lris_blue` for the current LRIS.
@@ -59,7 +64,7 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
   - **The sky model is provisional.** The spectrum was observed with LRIS, and it is not known whether the telescope + instrument throughput was removed. Taken as it stands, it is 1.5–2 mag fainter than `SKY_MAGS` in every band, by about the LRIS throughput. Divided by the LRIS throughput, it matches `SKY_MAGS` to ±0.5 mag. So the throughput was probably not removed, and `scale_to_mags` corrects for this until a better sky model replaces the file. It cut the default SNR by about 40%.
   - LSST z is used rather than SDSS z' because the sky stops at 9993 Å, while the SDSS z' curve runs to 13500 Å. The sky below about 3560 Å (the u' effective wavelength) keeps the u' correction, even though the LRIS throughput falls off there.
 - [Transmission.py](lris2_etc/Transmission.py): hard-coded extinction curve (mag/airmass), returned as a transmission at the given airmass.
-- [Moffat.py](lris2_etc/Moffat.py): Moffat PSF helpers. Only `moffat_frac` is used by the pipeline. `moffat_beta` inverts it for β, given a FWHM and the side of the centred square holding 50% of the energy. `moffat_snr*` and `make_1d_mod` (which prints) are exploratory.
+- [Moffat.py](lris2_etc/Moffat.py): Moffat PSF helpers. The pipeline uses `moffat_frac` and, for optimal extraction, `moffat_slit_profile` (the PSF fraction in each spatial pixel within the slit width). `moffat_beta` inverts it for β, given a FWHM and the side of the centred square holding 50% of the energy. `moffat_snr*` and `make_1d_mod` (which prints) are exploratory.
 - [depreciated/](depreciated/): old code kept for reference. It is not maintained and still uses the pre-package imports.
 - [data/sky/combine_blue_red.py](lris2_etc/data/sky/combine_blue_red.py): one-off script that generated the combined sky FITS from the LRIS blue (3002–6496 Å) and red (4700–9996 Å) spectra. Where the two overlap it adds them, which is right for counts taken through the LRIS dichroic. Run it from inside `lris2_etc/data/sky/`. It is not installed with the package.
 
@@ -89,7 +94,7 @@ All data lives under `lris2_etc/data/`, which `pyproject.toml` ships as package 
 - **In-place mutation.** `compute_spectrum` mutates `self.flux` and `self.sky.spec` in place, so calling it twice on the same `ExpCalc` compounds the scaling. Create a new `ExpCalc` per run. Each `ExpCalc` builds its own `Sky()`.
 - **Dark current** (`Instrument.dark`) is in e⁻/pix/s; values are written as `<e-/pix/hr>/3600.`. The LRIS-2 values are the intended ones. The legacy values are not accurate: LRIS red/blue (4 e⁻/pix/hr) are guesses, and DEIMOS (3.5 e⁻/pix/hr) is an average over its 8 detectors.
 - **Units.** Wavelengths are in Å throughout, except in the LRIS-2 throughput CSVs. Slit width and length and seeing are in arcsec.
-- The SNR is an unweighted (boxcar) sum over the extraction length: the whole slit by default, or `aperture` × FWHM. There is no optimal (profile-weighted) extraction.
+- By default the SNR is an unweighted (boxcar) sum over the extraction length: the whole slit, or `aperture` × FWHM. `optimal=True` (`-O`) uses Horne weighting over the same pixels instead. Over the whole 8" slit this roughly doubles the faint-source SNR, and at 1–1.5 × FWHM it gains about 5%.
 - `Sky.rescale` multiplies by `Ang_per_pix` by default (`per_pix=True`). `ExpCalc` calls it with `per_pix=False` and does the per-pixel conversion itself.
 
 ## Conventions

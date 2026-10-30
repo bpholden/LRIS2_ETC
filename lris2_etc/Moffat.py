@@ -117,6 +117,21 @@ def moffat_frac(size, width, height, beta=3):
                                 -width/2, width/2, -height/2, height/2)
     return frac
 
+def moffat_slit_profile(size, width, npix, pix_size, beta=3):
+    '''
+    moffat_slit_profile(size, width, npix, pix_size, beta=3)
+
+    Fraction of a Moffat PSF with FWHM size that falls in each of npix
+    pixels of pix_size along a slit of the given width, all in arcsec.
+    The PSF is centred on the middle of the npix pixels.
+    '''
+    edges = (numpy.arange(npix + 1) - npix/2) * pix_size
+    # light within +/- |y| of the centre, so each pixel is a difference of two
+    half = {abs(y): 0.5*moffat_frac(size, width, 2*abs(y), beta=beta) if y != 0 else 0.
+            for y in edges}
+    enclosed = numpy.array([numpy.sign(y) * half[abs(y)] for y in edges])
+    return numpy.diff(enclosed)
+
 def moffat_beta(size, side, beta_min=1.001, beta_max=1000.):
     '''
     moffat_beta(size, side, beta_min=1.001, beta_max=1000.)

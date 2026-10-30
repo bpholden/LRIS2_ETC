@@ -49,7 +49,7 @@ Inside the package, modules import each other relatively (`from . import Sky`). 
      The signal in both modes is the source flux inside the extraction, so the two SNRs compare directly. Optimal extraction assumes the profile is known exactly, centred, and the same at every wavelength.
   8. If `per_angstrom=True`, divide signal, sky and variance by Å/pix, so SNR per Å = SNR per pixel / √(Å/pix).
 
-  Results land in attributes over `waves[in_band]`: `signal`, `sky_flux`, `noise` (σ), `snr`, all per pixel or per Å as requested. `flux` remains the full-grid source spectrum in photons/Å. The scripts expose the option as `--per_angstrom`/`-A`, `aperture` as `--aperture`/`-x` and `optimal` as `--optimal`/`-O`; `run_lris2` also exposes `beta` as `--beta`/`-b`.
+  Results land in attributes over `waves[in_band]`: `signal`, `sky_flux`, `noise` (σ), `snr`, all per pixel or per Å as requested. `flux` remains the full-grid source spectrum in photons/Å. The scripts expose the option as `--per_angstrom`/`-A`, `aperture` as `--aperture`/`-x`, `optimal` as `--optimal`/`-O` and `beta` as `--beta`/`-b` (default 4).
 - [Instrument.py](lris2_etc/Instrument.py): `Instrument` is a parameter bag. Its configurator methods each take a `Telescope`:
   - `lris2_red` (R400/R725p1/R725p2) and `lris2_blue` (B600/B1250p1/B1250p2) for LRIS-2. The p1/p2 gratings each cover part of the arm, so they set narrower `BLUE_CUTOFF`/`RED_CUTOFF` values. The cutoffs are set by physical limits other than the efficiency curves. Their old design names, which still appear in the PDR spreadsheets, were R750→R725p1, R700→R725p2, B1300→B1250p1 and B1200→B1250p2.
   - `lris_red` and `lris_blue` for the current LRIS.
